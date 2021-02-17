@@ -1,19 +1,21 @@
+const { DataTypes } = require('sequelize');
+
 module.exports = (sequelize, type) => {
     return sequelize.define('Comment', {
         id: {
-            type: type.INTEGER.UNSIGNED,
+            type: DataTypes.INTEGER.UNSIGNED,
             primaryKey: true,
             autoIncrement: true
         },
         post_id: {
-            type: type.INTEGER,
+            type: DataTypes.INTEGER,
             allowNull: false
         },        
-        text: type.TEXT,
+        text: DataTypes.TEXT,
         user_id: {
-            type: type.INTEGER,
+            type: DataTypes.INTEGER,
             allowNull: false
         },
-        date_comment: type.DATE
+        date_comment: DataTypes.DATE
     })
 };

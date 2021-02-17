@@ -1,21 +1,23 @@
-module.exports = (sequelize, type) => {
+const { DataTypes } = require('sequelize');
+
+module.exports = (sequelize) => {
     return sequelize.define('Post', {
         id: {
-            type: type.INTEGER.UNSIGNED,
+            type: DataTypes.INTEGER.UNSIGNED,
             primaryKey: true,
             autoIncrement: true
         },
         title: {
-            type: type.STRING,
+            type: DataTypes.STRING,
             allowNull: false
         },
-        text: type.TEXT,
-        file_name: type.STRING,
+        text: DataTypes.TEXT,
+        file_name: DataTypes.STRING,
         user_id: {
-            type: type.INTEGER,
+            type: DataTypes.INTEGER,
             allowNull: false
         },
-        date_post: type.DATE,
-        last_modif: type.DATE
+        date_post: DataTypes.DATE,
+        last_modif: DataTypes.DATE
     })
 };
