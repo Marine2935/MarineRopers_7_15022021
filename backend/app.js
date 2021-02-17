@@ -3,6 +3,10 @@ const helmet = require('helmet');
 const bodyParser = require('body-parser');
 const path = require('path'); 
 
+const userRoutes = require('./routes/user');
+const postRoutes = require('./routes/post');
+const commentRoutes = require('./routes/comment');
+
 const app = express();
 
 // Limitation du nombre de requêtes à 100 par tranche de 10min.
@@ -48,5 +52,9 @@ app.use(helmet());
 app.use(limiter);
 
 app.use(bodyParser.json());
+
+app.use('/api/users', userRoutes);
+app.use('/api/posts', postRoutes);
+app.use('/api/posts/:id/comments', commentRoutes);
 
 module.exports = app;
