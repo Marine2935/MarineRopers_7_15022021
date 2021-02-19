@@ -1,82 +1,77 @@
-const Post = require('../models/Post');
+const { models } = require('../models');
 const fs = require('fs');
 
 
 exports.getAllPosts= (req, res, next) => {
-    db.query('SELECT * FROM posts', (err, result) => {
-        if (err) throw err;
-        res.send(result);
-    })
+    models.Post.findAll()
+    .then(posts => res.status(200).json(posts))
+    .catch(error => res.status(400).json({ error }));
 };
 
 exports.getOnePost = (req, res, next) => {
-    let postId = req.params.post_id;
-    db.query(`SELECT * FROM posts WHERE posts.id = ${postId}`, (err, result) => {
-        if (err) throw err;
-        res.send(result);
-    })
+    models.Post.findByPk(req.params.post_id)
+    .then(post => res.status(200).json(post))
+    .catch(error => res.status(404).json({ error }));
 };
 
 exports.createPost = (req, res, next) => {
-    const postObject = JSON.parse(req.body.post);
+    const post = req.file ?                                                                       // revoir la création de l'objet avec le file
+        ({
+            ...req.body,
+            file_name: `${req.protocol}://${req.get('host')}/files/${req.file.filename}`
+        }) : ({ ...req.body });
     
-    const post = req.file ?
-        new Post({
-            ...postObject,
-            fileUrl: `${req.protocol}://${req.get('host')}/files/${req.file.filename}`
-        }) : new Post({ ...req.body });
-    
-    db.query(`INSERT ${post} INTO posts`, callback)                                                  //callback à paramétrer
+    models.Post.create(post)
+    .then(() => res.status(201).json({ message: 'Nouveau post créé !'}))
+    .catch(error => res.status(400).json({ error }));
 };
 
 exports.modifyPost = (req, res, next) => {
-    let postId = req.params.post_id;
-    let request = '';
+    // Si modification du fichier, suppression du fichier initialement stocké dans le dossier files puis mise à jour du post.
+    if (req.file) {        
+        models.Post.findByPk(req.params.post_id)
+        .then(post => {
+            if (post !== NULL) {
+                const filename = post.file_name.split('/files/')[1];
 
-    if (req.file) {
-        db.query(`SELECT file_name FROM posts WHERE posts.id = ${postId}`, (err, result) => {
-            if (err) throw err;
-            return request = result;
-        });
-
-        if (request !== NULL) {
-            const filename = request.split('/files/')[1];
-
-            fs.unlink(`files/${filename}`, error => {
-                if (error) throw error;
-            });
-        }
+                fs.unlink(`files/${filename}`, error => {
+                    if (error) throw error;
+                });
+            };
+        })
+        .catch(error => res.status(404). json({ error }));
     };
 
     const postObject = JSON.parse(req.body.post);
     
-    const post = req.file ?
-        new Post({
+    const post = req.file ?                                                                       // revoir la création de l'objet avec le file
+        ({
             ...postObject,
-            fileUrl: `${req.protocol}://${req.get('host')}/files/${req.file.filename}`
-        }) : new Post({ ...req.body });
+            file_name: `${req.protocol}://${req.get('host')}/files/${req.file.filename}`
+        }) : ({ ...req.body });
 
-    db.query(`UPDATE ${post} FROM posts WHERE posts.id = ${postId}`, callback);                        //callback à paramétrer
+    models.Post.update(post, { where: { id: postId } })
+    .then(() => res.status(200).json({ message: 'Post modifié !' }))
+    .catch(error => res.status(400).json({ error }));
 };
 
 exports.deletePost = (req, res, next) => {
-    let postId = req.params.post_id;
-    let request = '';
+    // Suppression du fichier stocké dans le dossier files puis suppression du post.
+    models.Post.findByPk(req.params.post_id)
+    .then(post => {
+        if (post !== NULL) {
+            const filename = post.file_name.split('/files/')[1];
 
-    db.query(`SELECT file_name FROM posts WHERE posts.id = ${postId}`, (err, result) => {
-        if (err) throw err;
-        return request = result;
-    });
+            fs.unlink(`files/${filename}`, error => {
+                if (error) throw error;
+            });
+        };
+    })
+    .catch(error => res.status(404). json({ error }));        
 
-    if (request !== NULL) {
-        const filename = request.split('/files/')[1];
-
-        fs.unlink(`files/${filename}`, error => {
-            if (error) throw error;
-        });
-    };    
-
-    db.query(`DELETE * FROM posts WHERE posts.id = ${postId}`, callback);                                //callback à paramétrer
+    models.Post.destroy({ where: { id: req.params.post_id } })
+    .then(() => res.status(200).json({ message: 'Post supprimé !'}))
+    .catch(error => res.status(500).json({ error }));
 };
 
 exports.reactPost= (req, res, next) => {

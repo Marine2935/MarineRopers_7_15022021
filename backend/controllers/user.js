@@ -31,7 +31,7 @@ exports.login = (req, res, next) => {
             return res.status(401).json({
                 error: new Error("Utilisateur non trouvé !")
             });
-        }
+        };
 
         bcrypt.compare(req.body.password, user.password)
         .then(valid => {
@@ -39,10 +39,10 @@ exports.login = (req, res, next) => {
                 return res.status(401).json({
                     error: new Error("Mot de passe incorrect !")
                 });
-            }
+            };
 
             res.status(200).json({
-                userId: user.isSoftDeleted,
+                userId: user.id,
                 token: jwt.sign(
                     { user: user.id },
                     `${key}`,

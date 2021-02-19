@@ -1,18 +1,24 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <button @click="test">Bouton</button>
+    <CreationPost />   
   </div>
 </template>
 
 <script>
-// @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue'
+import CreationPost from '@/components/CreationPost.vue';
+import http from '../http';
 
 export default {
   name: 'Home',
   components: {
-    HelloWorld
+    CreationPost
+  },
+  methods: {
+    test() {
+      http.get('/posts/')
+      .then(response => console.log(response));
+    }
   }
 }
 </script>

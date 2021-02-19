@@ -1,83 +1,38 @@
-const Comment = require('../models/Comment');
+const { models } = require('../models');
 
 
 exports.getAllComments = (req, res, next) => {
-    let postId = req.params.post_id;
-    db.query(`SELECT * FROM comments WHERE comments.post_id = ${postId}`, (err, result) => {
-        if (err) throw err;
-        res.send(result);
-    })
+    models.Comment.findAll({ where: { post_id: req.params.post_id } })
+    .then(comments => res.status(200).json(comments))
+    .catch(error => res.status(400).json({ error }));
 };
 
-exports.createComment = (req, res, next) => {
-    const commentObject = JSON.parse(req.body.comment);
-    
-    const comment = req.file ?
-        new Comment({
-            ...commentObject,
-            post_id: req.params.post_id,
-            fileUrl: `${req.protocol}://${req.get('host')}/files/${req.file.filename}`,            
-        }) : new Comment({ 
-            ...req.body,
-            post_id: req.params.post_id 
-            });
-
-    db.query(`INSERT ${comment} INTO comments`, callback)                                                                                 //callback à paramétrer
-};
-
-exports.modifyComment = (req, res, next) => {
-    let commentId = req.params.id;
-    let request = ''
-
-    if (req.file) {
-        db.query(`SELECT file_name FROM comments WHERE comments.id = ${commentId}`, (err, result) => {
-            if (err) throw err;
-            return request = result;
-        });
-
-        if (request !== NULL) {
-            const filename = request.split('/files/')[1];
-
-            fs.unlink(`files/${filename}`, error => {
-                if (error) throw error;
-            });
-        }
+exports.createComment = (req, res, next) => {    
+    const comment = { 
+        ...req.body,
+        post_id: req.params.post_id 
     };
 
-    const commentObject = JSON.parse(req.body.comment);
-    
-    const comment = req.file ?
-        new Comment({
-            ...commentObject,
-            post_id: req.params.post_id,
-            fileUrl: `${req.protocol}://${req.get('host')}/files/${req.file.filename}`,            
-        }) : new Comment({ 
-            ...req.body,
-            post_id: req.params.post_id 
-            });
-
-    db.query(`UPDATE * FROM comments WHERE comments.id = ${commentId}`, callback)                                                 //callback à paramétrer
+    models.Comment.create(comment)
+    .then(() => res.status(201).json({ message: 'Nouveau commentaire créé !'}))
+    .catch(error => res.status(400).json({ error }));
 };
+
+// exports.modifyComment = (req, res, next) => {
+//     const comment = { 
+//         ...req.body,
+//         post_id: req.params.post_id 
+//     };
+
+//     models.Comment.update(comment, { where: { id: req.params.id } })
+//     .then(() => res.status(200).json({ message: 'Commentaire modifié !'}))
+//     .catch(error => res.status(400).json({ error }));
+// };
 
 exports.deleteComment = (req, res, next) => {
-    let commentId = req.params.id;
-    let request = ''
-
-    if (req.file) {
-        db.query(`SELECT file_name FROM comments WHERE comments.id = ${commentId}`, (err, result) => {
-            if (err) throw err;
-            return request = result;
-        });
-
-        if (request !== NULL) {
-            const filename = request.split('/files/')[1];
-
-            fs.unlink(`files/${filename}`, error => {
-                if (error) throw error;
-            });
-        }
-    };
-    db.query(`DELETE * FROM comments WHERE comments.post_id = ${postId} AND comments.id = ${commentId}`, callback)            //callback à paramétrer
+    models.Comment.destroy({ where: { id: req.params.id } })
+    .then(() => res.status(200).json({ message: 'Message supprimé !' }))
+    .catch(error => res.status(500).json({ error }));
 };
 
 exports.reactComment = (req, res, next) => {

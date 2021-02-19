@@ -1,6 +1,6 @@
 <template>
   <div class="login">
-    <h1>Inscription</h1>
+    <h1>Connexion</h1>
     <form method="get">
         <div>    
             <label for="username">Nom d'utilisateur</label><br>        
@@ -33,8 +33,8 @@ export default {
                 password: this.password
             }    
             http.post('/users/login', payload)
-                    .then(response => console.log(response))
-                    .catch(error => console.log(error));
+            .then(response => console.log(response))
+            .catch(error => console.log(error));
         }  
     }
 }

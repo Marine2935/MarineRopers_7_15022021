@@ -10,14 +10,6 @@ const commentRoutes = require('./routes/comment');
 const app = express();
 
 
-
-// db.connect(function(err) {
-//     if (err) throw err;
-//     console.log("Connecté à la base de données MySQL!");
-// });
-
-// global.db = db
-
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization');
