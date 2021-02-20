@@ -1,9 +1,11 @@
 const { models } = require('../models');
 const fs = require('fs');
 
+models.Post.belongsTo(models.User, { foreignKey: 'user_id' });
+
 
 exports.getAllPosts= (req, res, next) => {
-    models.Post.findAll()
+    models.Post.findAll({ include: [{ model: models.User, required: true }] })
     .then(posts => res.status(200).json(posts))
     .catch(error => res.status(400).json({ error }));
 };

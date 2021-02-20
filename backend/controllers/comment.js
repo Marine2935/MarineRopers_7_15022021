@@ -1,5 +1,8 @@
 const { models } = require('../models');
 
+models.Comment.belongsTo(models.User, { foreignKey: 'user_id' });
+models.Comment.belongsTo(models.Post, { foreignKey: 'post_id' });
+
 
 exports.getAllComments = (req, res, next) => {
     models.Comment.findAll({ where: { post_id: req.params.post_id } })

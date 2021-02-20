@@ -17,6 +17,9 @@ module.exports = (sequelize, type) => {
             allowNull: false
         }
     }, {
+        sequelize,
+        modelName: 'comment'
+    }, {
         createdAt: 'date_comment',
         updatedAt: false
     })
