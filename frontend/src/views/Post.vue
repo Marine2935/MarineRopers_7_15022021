@@ -1,16 +1,22 @@
-
+<template>
+    <div class="container mt-5">
+        <SinglePost />
+        <AllComments />
+        <AddComment />
+    </div>
+</template>
 
 <script>
-import http from '../http';
+import SinglePost from '@/components/SinglePost.vue';
+import AllComments from '@/components/AllComments.vue';
+import AddComment from '@/components/AddComment.vue';
 
 export default {
     name: 'Post',
-    methods: {
-        getOnePost() {
-            http.get('/posts/:post_id')
-            .then()
-        }
+    components: {
+        SinglePost,
+        AllComments,
+        AddComment
     }
-
 }
 </script>

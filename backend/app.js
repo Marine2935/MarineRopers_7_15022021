@@ -32,6 +32,6 @@ app.use(bodyParser.json());
 
 app.use('/api/users', userRoutes);
 app.use('/api/posts', postRoutes);
-app.use('/api/posts/:id/comments', commentRoutes);
+app.use('/api/posts', commentRoutes);
 
 module.exports = app;

@@ -1,6 +1,6 @@
 const { DataTypes } = require('sequelize');
 
-module.exports = (sequelize, type) => {
+module.exports = (sequelize) => {
     return sequelize.define('Comment', {
         id: {
             type: DataTypes.INTEGER.UNSIGNED,
@@ -16,9 +16,6 @@ module.exports = (sequelize, type) => {
             type: DataTypes.INTEGER,
             allowNull: false
         }
-    }, {
-        sequelize,
-        modelName: 'comment'
     }, {
         createdAt: 'date_comment',
         updatedAt: false

@@ -11,7 +11,7 @@ exports.getAllPosts= (req, res, next) => {
 };
 
 exports.getOnePost = (req, res, next) => {
-    models.Post.findByPk(req.params.post_id)
+    models.Post.findByPk(req.params.post_id, { include: [{ model: models.User, required: true }] })
     .then(post => res.status(200).json(post))
     .catch(error => res.status(404).json({ error }));
 };

@@ -56,6 +56,7 @@ export default {
             };   
             http.post('/users/signup', payload)
             .then(response => console.log(response))
+            .catch(error => console.log(error));
         }  
     }
 }
