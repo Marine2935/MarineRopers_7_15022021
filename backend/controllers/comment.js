@@ -1,10 +1,24 @@
 const { models } = require('../models');
+const sequelize = require('../models/index');
 
 models.Comment.belongsTo(models.User, { foreignKey: 'user_id' });
 models.Comment.belongsTo(models.Post, { foreignKey: 'post_id' });
 
 exports.getAllComments = (req, res, next) => {
-    models.Comment.findAll({ where: { post_id: req.params.post_id }, include: [{ model: models.User, required: true }] } )
+    models.Comment.findAll({ 
+        where: { post_id: req.params.post_id }, 
+        include: [{ model: models.User, required: true }],
+        attributes: { 
+            include: [
+                [ sequelize.fn('TIMESTAMPDIFF', sequelize.literal('SECOND'), sequelize.col('date_comment'), sequelize.literal('CURRENT_TIMESTAMP')), 'date_comment_sec' ],
+                [ sequelize.fn('TIMESTAMPDIFF', sequelize.literal('MINUTE'), sequelize.col('date_comment'), sequelize.literal('CURRENT_TIMESTAMP')), 'date_comment_min' ],
+                [ sequelize.fn('TIMESTAMPDIFF', sequelize.literal('HOUR'), sequelize.col('date_comment'), sequelize.literal('CURRENT_TIMESTAMP')), 'date_comment_hour' ],
+                [ sequelize.fn('TIMESTAMPDIFF', sequelize.literal('DAY'), sequelize.col('date_comment'), sequelize.literal('CURRENT_TIMESTAMP')), 'date_comment_day' ],
+                [ sequelize.fn('TIMESTAMPDIFF', sequelize.literal('MONTH'), sequelize.col('date_comment'), sequelize.literal('CURRENT_TIMESTAMP')), 'date_comment_month' ],
+                [ sequelize.fn('TIMESTAMPDIFF', sequelize.literal('YEAR'), sequelize.col('date_comment'), sequelize.literal('CURRENT_TIMESTAMP')), 'date_comment_year' ]               
+            ]
+        } 
+    })
     .then(comments => res.status(200).json(comments))
     .catch(error => res.status(400).json({ error }));
 };

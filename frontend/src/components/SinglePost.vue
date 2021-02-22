@@ -6,13 +6,27 @@
                     <b-avatar></b-avatar><!-- image profil -->
                     <div class="ml-3">
                         <p class="font-weight-bold m-0">{{ post.User.username }}</p>
-                        <p>{{ post.date_post }}</p>
+                        <p>
+                            <span v-if="post.date_post_second < 60">{{ post.date_post_second }}s</span>
+                            <span v-if="post.date_post_minute < 60 && post.date_post_minute !== 0">{{ post.date_post_minute }}min</span>
+                            <span v-if="post.date_post_hour < 24 && post.date_post_hour !== 0">{{ post.date_post_hour }}h</span>
+                            <span v-if="post.date_post_day < 30 && post.date_post_day !== 0">{{ post.date_post_day }} jour<span v-if="post.date_post_day > 1">s</span></span>  
+                            <span v-if="post.date_post_month < 12 && post.date_post_month !== 0">{{ post.date_post_month }} mois</span>
+                            <span v-if="post.date_post_year !== 0">{{ post.date_post_year }} année<span v-if="post.date_post_year > 1">s</span></span>                              
+                        </p>
                     </div>
                 </div>
                 <p>{{ post.text }}</p>
                 <div class="d-flex justify-content-between">
-                    <p class="m-0">{{}} Commentaire<span v-if="comments > 1">s</span></p>
-                    <p class="m-0" v-if="post.last_update">Dernière modification : {{ post.last_update }}</p>
+                    <p class="m-0">{{ post.Comments.length }} Commentaire<span v-if="post.Comments.length > 1">s</span></p>
+                    <p class="m-0" v-if="post.last_update">Modifié il y a 
+                        <span v-if="post.last_update_second < 60">{{ post.last_update_second }}s</span>
+                        <span v-if="post.last_update_minute < 60 && post.last_update_minute !== 0">{{ post.last_update_minute }}min</span>
+                        <span v-if="post.last_update_hour < 24 && post.date_post_hour !== 0">{{ post.last_update_hour }}h</span>
+                        <span v-if="post.last_update_day < 30 && post.date_post_day !== 0">{{ post.last_update_day }} jour<span v-if="post.date_post_day > 1">s</span></span>  
+                        <span v-if="post.last_update_month < 12 && post.last_update_month !== 0">{{ post.last_update_month }} mois</span>
+                        <span v-if="post.last_update_year !== 0">{{ post.last_update_year }} année<span v-if="post.last_update_year > 1">s</span></span>
+                    </p>
                 </div> 
             </div>
         </div>
