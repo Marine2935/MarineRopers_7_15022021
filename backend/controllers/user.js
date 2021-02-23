@@ -10,7 +10,7 @@ exports.signup = (req, res, next) => {
     // Hachage du mot de passe avant qu'il soit envoyé à la base de données.
     bcrypt.hash(req.body.password, 10)
     .then(hash => {  
-        models.User.create({
+        models.users.create({
             last_name: req.body.last_name,
             first_name: req.body.first_name,
             username: req.body.username,
@@ -24,7 +24,7 @@ exports.signup = (req, res, next) => {
 };
 
 exports.login = (req, res, next) => {
-    models.User.findOne({ where: { username: req.body.username } })
+    models.users.findOne({ where: { username: req.body.username } })
     .then(user => {
         console.log(user);
         if (!user) {
@@ -42,7 +42,8 @@ exports.login = (req, res, next) => {
             };
 
             res.status(200).json({
-                userId: user.id,
+                id: user.id,
+                isAdmin: user.isAdmin,
                 token: jwt.sign(
                     { user: user.id },
                     `${key}`,

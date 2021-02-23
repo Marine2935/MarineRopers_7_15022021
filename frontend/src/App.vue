@@ -1,17 +1,24 @@
 <template>
     <div id="app">
         <header class="header">
-            <nav id="nav">
-                <router-link to="/"><img src="./assets/icon-white.svg" alt="Logo Groupomania" class="logo_header" /></router-link>
-                <div>
-                    <router-link to="/signup">Inscription</router-link> |
-                    <router-link to="/login">Connexion</router-link>
-                </div>
+            <nav id="nav" class="d-flex justify-content-between align-items-center p-4">
+                <router-link to="/feed"><img src="./assets/icon-white.svg" alt="Logo Groupomania" class="logo_header" /></router-link>
+                <NavBar />
             </nav>
         </header>
         <router-view/>
     </div>
 </template>
+
+<script>
+import NavBar from '@/components/NavBar';
+
+export default {
+    components: {
+        NavBar
+    }
+}
+</script>
 
 <style lang="scss">
 #app {
@@ -30,19 +37,12 @@
     height: 40px;
 }
 
-#nav {
-    padding: 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+#nav a {
+    font-weight: bold;
+    color: #FFF;
 
-    a {
-        font-weight: bold;
-        color: #FFF;
-
-        &.router-link-exact-active {
-          color: #42b983;
-        }
+    &.router-link-exact-active {
+        color: #42b983;
     }
 }
 </style>

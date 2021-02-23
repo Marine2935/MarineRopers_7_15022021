@@ -1,13 +1,15 @@
 const { models } = require('../models');
 const sequelize = require('../models/index');
 
-models.Comment.belongsTo(models.User, { foreignKey: 'user_id' });
-models.Comment.belongsTo(models.Post, { foreignKey: 'post_id' });
+models.comments.belongsTo(models.users, { foreignKey: 'user_id' });
+models.comments.belongsTo(models.posts, { foreignKey: 'post_id' });
+models.comment_reactions.belongsTo(models.comments, { foreignKey: 'post_id' });
+models.comment_reactions.belongsTo(models.users, { foreignKey: 'user_id' });
 
 exports.getAllComments = (req, res, next) => {
-    models.Comment.findAll({ 
+    models.comments.findAll({ 
         where: { post_id: req.params.post_id }, 
-        include: [{ model: models.User, required: true }],
+        include: [{ model: models.users, required: true }],
         attributes: { 
             include: [
                 [ sequelize.fn('TIMESTAMPDIFF', sequelize.literal('SECOND'), sequelize.col('date_comment'), sequelize.literal('CURRENT_TIMESTAMP')), 'date_comment_sec' ],
@@ -17,7 +19,8 @@ exports.getAllComments = (req, res, next) => {
                 [ sequelize.fn('TIMESTAMPDIFF', sequelize.literal('MONTH'), sequelize.col('date_comment'), sequelize.literal('CURRENT_TIMESTAMP')), 'date_comment_month' ],
                 [ sequelize.fn('TIMESTAMPDIFF', sequelize.literal('YEAR'), sequelize.col('date_comment'), sequelize.literal('CURRENT_TIMESTAMP')), 'date_comment_year' ]               
             ]
-        } 
+        },
+        order: sequelize.literal('date_comment DESC') 
     })
     .then(comments => res.status(200).json(comments))
     .catch(error => res.status(400).json({ error }));
@@ -30,7 +33,7 @@ exports.createComment = (req, res, next) => {
         post_id: req.params.post_id
     };
     console.log(comment);
-    models.Comment.create(comment)
+    models.comments.create(comment)
     .then(() => res.status(201).json({ message: 'Nouveau commentaire créé !'}))
     .catch(error => res.status(400).json({ error }));
 };
@@ -47,11 +50,41 @@ exports.createComment = (req, res, next) => {
 // };
 
 exports.deleteComment = (req, res, next) => {
-    models.Comment.destroy({ where: { id: req.params.id } })
+    models.comments.destroy({ where: { id: req.params.comment_id } })
     .then(() => res.status(200).json({ message: 'Message supprimé !' }))
     .catch(error => res.status(500).json({ error }));
 };
 
-exports.reactComment = (req, res, next) => {
+exports.getCommentReactions = (req, res, next) => {
+    models.comment_reactions.findAll({ 
+        attributes: [
+            [
+                sequelize.literal(`(
+                    SELECT COUNT('has_liked') 
+                    FROM comment_reactions
+                    WHERE has_liked = true AND comment_id = ${req.params.comment_id}          
+                )`), 'like'
+            ],
+            [
+                sequelize.literal(`(
+                    SELECT COUNT('has_liked') 
+                    FROM comment_reactions
+                    WHERE has_liked = false AND comment_id = ${req.params.comment_id}            
+                )`), 'dislike'
+            ]
+        ]
+    })
+    .then(reactions => res.status(200).json(reactions))
+    .catch(error => res.status(404).json({ error }));
+};
 
+exports.newCommentReaction = (req, res, next) => {
+    const reaction = { 
+        ...req.body,
+        comment_id: req.params.comment_id    
+     }
+
+    models.comment_reactions.create(reaction)
+    .then(() => res.status(201).json({ message: 'Nouvelle réaction ajoutée !'}))
+    .catch(error => res.status(400).json({ error }));
 };

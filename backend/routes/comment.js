@@ -8,7 +8,8 @@ const commentCtrl = require('../controllers/comment');
 router.get('/:post_id/comments/', commentCtrl.getAllComments);
 router.post('/:post_id/comments/', commentCtrl.createComment);
 //router.put('/:post_id/comments/:id', auth, commentCtrl.modifyComment);
-router.delete('/:post_id/comments/:id', auth, commentCtrl.deleteComment);
-router.post('/:post_id/comments/:id/reaction', auth, commentCtrl.reactComment);
+router.delete('/:post_id/comments/:comment_id', auth, commentCtrl.deleteComment);
+router.get('/:post_id/comments/:comment_id/reactions', commentCtrl.getCommentReactions);
+router.post('/:post_id/comments/:comment_id/reactions', commentCtrl.newCommentReaction);
 
 module.exports = router;

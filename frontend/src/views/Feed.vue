@@ -6,11 +6,11 @@
 </template>
 
 <script>
-import CreationPost from '@/components/CreationPost.vue';
-import AllPosts from '@/components/AllPosts.vue';
+import CreationPost from '@/components/CreationPost';
+import AllPosts from '@/components/AllPosts';
 
 export default {
-    name: 'Home',
+    name: 'Feed',
     components: {
         CreationPost,
         AllPosts

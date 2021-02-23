@@ -8,15 +8,19 @@
                 <div class="row bg-white rounded shadow-sm p-3">
                     <div class="col pl-1">
                         <div class="text-left align-items-center">                    
-                            <p class="font-weight-bold m-0">{{ comment.User.username }}</p>                    
+                            <p class="font-weight-bold m-0">{{ comment.user.username }}</p>                    
                         </div>
                         <div class="mb-2">
                             {{ comment.text }}
                         </div>
                     </div>
                 </div>
-                <div class="row text-right"> 
-                    <div class="col text-right mt-2">
+                <div class="row justify-content-between mt-2"> 
+                    <div class="col text-left d-flex ">
+                        <Reactions :type="'comment'" :commentId="comment.id"/>
+                        <button class="border-0 font-weight-bold text-dark button ml-3">Répondre</button>
+                    </div>
+                    <div class="col text-right">
                         <span v-if="comment.date_comment_second < 60">{{ comment.date_comment_second }}s</span>
                         <span v-if="comment.date_comment_minute < 60 && comment.date_comment_minute !== 0">{{ comment.date_comment_minute }}min</span>
                         <span v-if="comment.date_comment_hour < 24 && comment.date_comment_hour !== 0">{{ comment.date_comment_hour }}h</span>
@@ -31,10 +35,14 @@
 </template>
 
 <script>
-import http from '../http';
+import http from '@/http';
+import Reactions from '@/components/Reactions';
 
 export default {
     name: 'AllComments',
+    components: {
+        Reactions
+    },
     data() {
         return {
             comments: null
@@ -47,3 +55,9 @@ export default {
     }
 }
 </script>
+
+<style lang="scss">
+.button {
+    background-color: transparent;
+}
+</style>
