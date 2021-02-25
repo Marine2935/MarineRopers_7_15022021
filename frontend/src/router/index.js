@@ -25,12 +25,12 @@ const routes = [
         component: () => import('../views/Post.vue')
     },
     {
-        path: '/users/:user_id',
+        path: '/users/:user_id/:username/profil',
         name: 'UserProfil',
         component: () => import('../views/UserProfil.vue')
     },
     {
-        path: '/user_posts',
+        path: '/users/:user_id/:username/posts',
         name: 'UserPosts',
         component: () => import('../views/UserPosts.vue')
     } 

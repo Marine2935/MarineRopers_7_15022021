@@ -21,8 +21,8 @@
                         <button class="border-0 font-weight-bold text-dark button ml-3">Répondre</button>
                     </div>
                     <div class="col text-right">
-                        <span v-if="comment.date_comment_second < 60">{{ comment.date_comment_second }}s</span>
-                        <span v-if="comment.date_comment_minute < 60 && comment.date_comment_minute !== 0">{{ comment.date_comment_minute }}min</span>
+                        <span v-if="comment.date_comment_sec < 60">{{ comment.date_comment_sec }}s</span>
+                        <span v-if="comment.date_comment_min < 60 && comment.date_comment_min !== 0">{{ comment.date_comment_min }}min</span>
                         <span v-if="comment.date_comment_hour < 24 && comment.date_comment_hour !== 0">{{ comment.date_comment_hour }}h</span>
                         <span v-if="comment.date_comment_day < 30 && comment.date_comment_day !== 0">{{ comment.date_comment_day }}j</span>  
                         <span v-if="comment.date_comment_month < 12 && comment.date_comment_month !== 0">{{ comment.date_comment_month }} mois</span>

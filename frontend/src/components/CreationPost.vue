@@ -1,17 +1,21 @@
 <template>
-    <div class="container mt-5" v-if="loggedUser.id !== 0">
+    <div class="mt-5">
         <div class="row justify-content-center">
-            <div class="col-8 bg-white rounded shadow-sm p-3">
+            <div class="col-8 text-left bg-white d-flex rounded shadow-sm p-3">
                 <b-avatar></b-avatar><!-- image profil -->
-                <button class="ml-3 px-4 py-2 rounded-pill border-0 w-75 text-left text-secondary" @click="displayPopup = !displayPopup">Que voulez-vous dire, <!--{{ user.first_name ou username }}--> ?</button>
+                <div class="w-100 ml-3">
+                    <button class="px-4 py-2 rounded-pill border-0 text-left text-secondary w-100" @click="displayPopup = !displayPopup">
+                        Que voulez-vous dire, {{ loggedUser.username }} ?
+                    </button>
+                </div>
             </div>
-        </div>
-        <div v-show="displayPopup" class="popup justify-content-center align-items-center">
+        </div>        
+        <div class="popup justify-content-center align-items-center" v-show="displayPopup">
             <div class="popup__container p-4 shadow">
-                <button class="btn_close p-2" @click="displayPopup= !displayPopup"><b-icon icon="x-circle" font-scale="1.5"></b-icon></button>
-                <h2>Créer un nouveau post</h2>
-                <div>
-                    <!-- image profil --> <!--{{ username }}-->
+                <button class="btn_close p-2" @click="displayPopup = !displayPopup"><b-icon icon="x-circle" font-scale="1.5"></b-icon></button>
+                <h3>Créer un nouveau post</h3><hr>
+                <div class="text-left">
+                    <p><b-avatar></b-avatar><!-- image profil --><span class="ml-3">{{ loggedUser.username }}</span></p><!-- image profil --> <!--{{ username }}-->
                 </div>
                 <form method="get">
                     <p>
@@ -23,7 +27,7 @@
                         <input type="file" name="file">
                     </p>
                 </form>
-            <button @click="send">Envoyer</button>
+            <button class="bg-dark text-white rounded-pill mt-3 px-4 py-2" @click="send">Envoyer</button>
             </div>
         </div>
     </div>
@@ -42,14 +46,18 @@ export default {
             displayPopup: false
         }
     },
+    props: {
+        display: Boolean
+    },
     methods: {
         send() {
             let payload = {
                 text: this.text,
-                file_name: this.file_name
+                file_name: this.file_name,
+                user_id: this.loggedUser.id
             }
             http.post('/posts/', payload)
-            .then(response => console.log(response))
+            .then(this.$router.push('/feed'))
             .catch(error => console.log(error));
         }
     },
@@ -59,7 +67,7 @@ export default {
 }
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
 .popup {
     display: flex;
     content: "";
@@ -83,6 +91,7 @@ export default {
 }
 
 .btn_close {
+    color: #2c3e50!important;
     background: none; 
     border: none;    
     position: absolute;

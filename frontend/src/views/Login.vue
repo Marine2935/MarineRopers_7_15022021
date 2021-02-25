@@ -59,14 +59,6 @@ export default {
 </script>
 
 <style lang="scss">
-a {
-    cursor: pointer; 
-
-    &:hover {
-        text-decoration: none;    
-    } 
-}
-
 .forgot_pass {
     color: #2c3e50;
     font-size: 0.9rem;

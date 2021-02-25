@@ -4,6 +4,8 @@ const sequelize = require('../models/index');
 
 const { models } = require('../models');
 
+models.users.hasMany(models.posts, { foreignKey: 'user_id' });
+models.users.hasMany(models.comments, { foreignKey: 'user_id' });
 models.posts.belongsTo(models.users, { foreignKey: 'user_id' });
 models.posts.hasMany(models.comments, { foreignKey: 'post_id' });
 
@@ -46,6 +48,7 @@ exports.login = (req, res, next) => {
 
             res.status(200).json({
                 id: user.id,
+                username: user.username,
                 isAdmin: user.isAdmin,
                 token: jwt.sign(
                     { user: user.id },
@@ -59,7 +62,56 @@ exports.login = (req, res, next) => {
     .catch(error => res.status(404).json({ error }));
 };
 
-exports.modifyProfil = (req, res, next) => {
+exports.getUser = (req, res, next) => {
+    models.users.findByPk(req.params.user_id, {
+        attributes: {
+            include: [
+                [
+                    sequelize.literal(`(
+                        SELECT COUNT(*) 
+                        FROM posts
+                        WHERE user_id = ${req.params.user_id}          
+                    )`), 'posts_count'
+                ],
+                [
+                    sequelize.literal(`(
+                        SELECT COUNT(*) 
+                        FROM comments
+                        WHERE user_id = ${req.params.user_id}            
+                    )`), 'comments_count'
+                ],
+                [
+                    sequelize.literal(`(
+                        SELECT 
+                        (SELECT COUNT(*) 
+                        FROM post_reactions
+                        WHERE user_id = ${req.params.user_id} AND has_liked = true) 
+                        + 
+                        (SELECT COUNT(*) 
+                        FROM comment_reactions
+                        WHERE user_id = ${req.params.user_id} AND has_liked = true)           
+                    )`), 'likes_count'
+                ],
+                [
+                    sequelize.literal(`(
+                        SELECT 
+                        (SELECT COUNT(*) 
+                        FROM post_reactions
+                        WHERE user_id = ${req.params.user_id} AND has_liked = false)
+                         + 
+                        (SELECT COUNT(*) 
+                        FROM comment_reactions
+                        WHERE user_id = ${req.params.user_id} AND has_liked = false)            
+                    )`), 'dislikes_count'
+                ]
+            ]
+        }
+    })
+    .then(user => res.status(200).json(user))
+    .catch(error => res.status(404).json({ error }));
+};
+
+exports.modifyUser = (req, res, next) => {
 
 };
 

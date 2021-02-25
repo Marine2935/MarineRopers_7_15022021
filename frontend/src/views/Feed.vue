@@ -2,9 +2,11 @@
     <div class="feed">
         <div class="my-5 py-5" v-if="loggedUser.id === 0">
             <p class="container h3 my-5 py-5">Vous êtes sur le réseau social interne de l'entreprise Groupomania,<br>merci de vous connecter pour pouvoir accéder au contenu.</p>
-        </div>              
-        <CreationPost />
-        <AllPosts />        
+        </div>
+        <div class="container mt-5" v-else>            
+            <CreationPost />
+            <AllPosts /> 
+        </div>    
     </div>
 </template>
 
@@ -24,10 +26,3 @@ export default {
     }   
 }
 </script>
-
-<style lang="scss">
-a {
-    cursor: pointer;
-    text-decoration: none!important;
-}
-</style>

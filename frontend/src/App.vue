@@ -49,6 +49,15 @@ export default {
     color: #2c3e50;
 }
 
+a {
+    cursor: pointer;
+    color: #2c3e50!important;
+
+    &:hover {
+        text-decoration: none!important;    
+    }
+}
+
 .header {
     background-color: #303030;
 }
