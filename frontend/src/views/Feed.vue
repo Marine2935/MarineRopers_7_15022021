@@ -1,11 +1,15 @@
 <template>
-    <div class="home">        
+    <div class="feed">
+        <div class="my-5 py-5" v-if="loggedUser.id === 0">
+            <p class="container h3 my-5 py-5">Vous êtes sur le réseau social interne de l'entreprise Groupomania,<br>merci de vous connecter pour pouvoir accéder au contenu.</p>
+        </div>              
         <CreationPost />
-        <AllPosts />
+        <AllPosts />        
     </div>
 </template>
 
 <script>
+import { mapState } from "vuex";
 import CreationPost from '@/components/CreationPost';
 import AllPosts from '@/components/AllPosts';
 
@@ -14,7 +18,10 @@ export default {
     components: {
         CreationPost,
         AllPosts
-    }    
+    },
+    computed: {
+        ...mapState(['loggedUser'])
+    }   
 }
 </script>
 

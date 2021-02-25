@@ -12,10 +12,30 @@
 
 <script>
 import NavBar from '@/components/NavBar';
+import { mapState } from "vuex";
 
 export default {
     components: {
         NavBar
+    },
+    mounted() {
+        this.check()
+    },
+    methods: {
+        check() {            
+            if (this.loggedUser.id == 0) {
+                if (sessionStorage.getItem('token')) {
+                    sessionStorage.removeItem('token')
+                }
+                if (this.$router.currentRoute.path !== '/' || this.$router.currentRoute.path !== '/signup') {
+                    this.$router.push('/')
+                }
+                
+            }
+        }
+    },
+    computed: {
+        ...mapState(['loggedUser'])
     }
 }
 </script>
@@ -37,12 +57,7 @@ export default {
     height: 40px;
 }
 
-#nav a {
-    font-weight: bold;
-    color: #FFF;
-
-    &.router-link-exact-active {
-        color: #42b983;
-    }
+.btn:focus {
+    box-shadow: unset!important;
 }
 </style>

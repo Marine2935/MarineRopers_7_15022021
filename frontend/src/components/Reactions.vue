@@ -1,5 +1,5 @@
 <template>
-    <div class="d-flex">
+    <div class="d-flex" v-if="reactions">
         <p class="m-0">
             <span>{{ reactions[0].like }}</span>
             <button class="border-0 bg-white btn-like" @click="react({ has_liked: true })">

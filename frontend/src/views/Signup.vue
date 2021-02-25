@@ -1,33 +1,34 @@
 <template>
-  <div class="signup">
+  <div class="signup container my-5">
     <h1>Inscription</h1>
-    <form method="get">        
-        <p>    
+    <form method="get" class="mx-auto m-3 mt-5 w-50">        
+        <div class="form-group my-3">    
             <label for="lastName">Nom</label><br>        
-            <input type="text" name="lastName" v-model="last_name" required>
-        </p>
-        <p>    
+            <input class="form-control rounded" type="text" name="lastName" v-model="last_name" required>
+        </div>
+        <div class="form-group my-3">    
             <label for="firstName">Prénom</label><br>        
-            <input type="text" name="firstName" v-model="first_name" required>
-        </p>
-        <p>    
+            <input class="form-control rounded" type="text" name="firstName" v-model="first_name" required>
+        </div>
+        <div class="form-group my-3">    
             <label for="username">Nom d'utilisateur</label><br>        
-            <input type="text" name="username" v-model="username" required>
-        </p>
-        <p>
+            <input class="form-control rounded" type="text" name="username" v-model="username" required>
+        </div>
+        <div class="form-group my-3">
             <label for="email">Adresse mail</label><br>
-            <input type="email" name="email" v-model="email" required >
-        </p>
-        <p>
+            <input class="form-control rounded" type="email" name="email" v-model="email" required >
+        </div>
+        <div class="form-group my-3">
             <label for="password">Mot de passe</label><br>
-            <input type="password" name="password" v-model="password" required>
-        </p>
-        <p>    
+            <input class="form-control rounded" type="password" name="password" aria-describedby="passwordHelp" v-model="password" required>
+            <small id="passwordHelp" class="form-text text-muted">Doit contenir au moins 8 caractères dont une minuscule, une majuscule, un chiffre et un caractère spécial.</small>
+        </div>
+        <div class="form-group my-3">    
             <label for="avatar">Image de profil</label><br>        
-            <input type="file" name="avatar"  accept="image/png, image/jpg, image/jpeg">
-        </p>
+            <input type="file" name="avatar" accept="image/png, image/jpg, image/jpeg">
+        </div>
     </form>
-    <button @click="signup">Inscription</button>
+    <button class="bg-dark text-white rounded-pill m-4 px-4 py-2" @click="signup">Inscription</button>
   </div>
 </template>
 

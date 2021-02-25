@@ -1,5 +1,5 @@
 <template>
-    <div class="container mt-5">
+    <div class="container mt-5" v-if="loggedUser.id !== 0">
         <div class="row justify-content-center">
             <div class="col-8 bg-white rounded shadow-sm p-3">
                 <b-avatar></b-avatar><!-- image profil -->
@@ -31,6 +31,7 @@
 
 <script>
 import http from '@/http';
+import { mapState } from "vuex";
 
 export default {
     name: 'CreationPost',
@@ -51,6 +52,9 @@ export default {
             .then(response => console.log(response))
             .catch(error => console.log(error));
         }
+    },
+    computed: {
+        ...mapState(['loggedUser'])
     }
 }
 </script>

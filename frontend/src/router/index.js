@@ -20,10 +20,20 @@ const routes = [
         component: () => import('../views/Feed.vue')
     },
     {
-        path: '/Post/:post_id',
+        path: '/post/:post_id',
         name: 'Post',
         component: () => import('../views/Post.vue')
-    }  
+    },
+    {
+        path: '/users/:user_id',
+        name: 'UserProfil',
+        component: () => import('../views/UserProfil.vue')
+    },
+    {
+        path: '/user_posts',
+        name: 'UserPosts',
+        component: () => import('../views/UserPosts.vue')
+    } 
 ]
 
 const router = new VueRouter({

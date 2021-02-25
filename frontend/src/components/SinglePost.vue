@@ -1,7 +1,7 @@
 <template>
     <div class="container mt-5">
         <div class="row justify-content-center">
-            <div class="test col-8 bg-white rounded shadow-sm p-3 my-3">
+            <div class="test col-8 bg-white rounded shadow-sm p-3 my-3" v-if="post">
                 <div class="text-left d-flex">
                     <b-avatar></b-avatar><!-- image profil -->
                     <div class="ml-3">
