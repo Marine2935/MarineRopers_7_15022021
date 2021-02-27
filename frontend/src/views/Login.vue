@@ -35,7 +35,7 @@ export default {
         ...mapMutations([
             'initUser'
         ]),
-        login() {  
+        login() {              
             let payload = {
                 username: this.username,
                 password: this.password

@@ -2,7 +2,7 @@
     <div>
         <div v-if="loggedUser.id !== 0">
             <b-dropdown data-toggle="dropdown" block variant="link" id="dropdown-offset"  offset="-70" toggle-class="text-decoration-none" no-caret>
-                <template #button-content><b-avatar></b-avatar></template>
+                <template #button-content><b-avatar :src="loggedUser.avatarUrl"></b-avatar></template>
                 <b-dropdown-item class="text-dark py-1" :to="{ name: 'UserProfil', params: { user_id: `${loggedUser.id}`, username: `${loggedUser.username}` } }">
                     <b-icon class="mr-2" icon="person-square"></b-icon>Mon profil
                 </b-dropdown-item>

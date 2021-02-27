@@ -13,7 +13,7 @@ module.exports = (sequelize) => {
             type: DataTypes.STRING,
             allowNull: false
         },
-        image_name: DataTypes.STRING,
+        avatar_url: DataTypes.STRING,
         email: {
             type: DataTypes.STRING,
             allowNull: false

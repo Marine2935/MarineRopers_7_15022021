@@ -30,6 +30,8 @@ app.use(limiter);
 
 app.use(bodyParser.json());
 
+app.use('/files', express.static(path.join(__dirname, 'files')));
+
 app.use('/api/users', userRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/posts', commentRoutes);

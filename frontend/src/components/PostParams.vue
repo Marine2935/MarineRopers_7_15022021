@@ -22,7 +22,10 @@ export default {
         },
         deletePost() {
             http.delete(`/posts/${this.post_id}`)
-            .then(this.$router.push('/feed'))
+            .then(() => {
+                if (this.$router.currentRoute.path !== '/feed')
+                this.$router.push('/feed')
+            })
             .catch(error => console.log(error));
         }
     }

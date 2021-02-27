@@ -1,8 +1,8 @@
 <template>
     <div class="mt-5">
         <div class="row justify-content-center">
-            <div class="col-8 text-left bg-white d-flex rounded shadow-sm p-3">
-                <b-avatar></b-avatar><!-- image profil -->
+            <div class="col-8 text-left bg-white d-flex rounded shadow-sm p-3 align-items-center">
+                <b-avatar :src="loggedUser.avatarUrl" size="3rem"></b-avatar><!-- image profil -->
                 <div class="w-100 ml-3">
                     <button class="px-4 py-2 rounded-pill border-0 text-left text-secondary w-100" @click="displayPopup = !displayPopup">
                         Que voulez-vous dire, {{ loggedUser.username }} ?
@@ -17,17 +17,20 @@
                 <div class="text-left">
                     <p><b-avatar></b-avatar><!-- image profil --><span class="ml-3">{{ loggedUser.username }}</span></p><!-- image profil --> <!--{{ username }}-->
                 </div>
-                <form method="get">
-                    <p>
+                <form @submit.prevent="send">
+                    <div class="form-group">
                         <label>Contenu du post</label><br>
-                        <textarea class="border-light" name="text_post" rows="6" cols="50" v-model="text" required></textarea>
-                    </p>
-                    <p>    
-                        <label for="file">Ajouter un fichier</label><br>        
-                        <input type="file" name="file">
-                    </p>
+                        <textarea class="form-control border-light" name="text_post" rows="6" cols="50" v-model="text" required></textarea>
+                    </div>
+                    <div class="form-group">    
+                        <label for="file">Ajouter un fichier</label><br>
+                        <div class="mt-2 mb-3" v-if="filePreview">
+                            <img :src="this.filePreview" size="6rem" />    
+                        </div>        
+                        <input type="file" name="file" @change="onFileUpload">
+                    </div>
+                    <button class="bg-dark text-white rounded-pill mt-3 px-4 py-2" @click="send">Envoyer</button>
                 </form>
-            <button class="bg-dark text-white rounded-pill mt-3 px-4 py-2" @click="send">Envoyer</button>
             </div>
         </div>
     </div>
@@ -42,27 +45,46 @@ export default {
     data() {
         return {
             text: '',
-            file_name: '',
+            file: null,
+            filePreview: '',
             displayPopup: false
         }
     },
     props: {
         display: Boolean
     },
-    methods: {
-        send() {
-            let payload = {
-                text: this.text,
-                file_name: this.file_name,
-                user_id: this.loggedUser.id
-            }
-            http.post('/posts/', payload)
-            .then(this.$router.push('/feed'))
-            .catch(error => console.log(error));
-        }
-    },
     computed: {
         ...mapState(['loggedUser'])
+    },
+    methods: {
+        onFileUpload(event) {
+            this.file = event.target.files[0];
+            this.createImage(this.file);
+        },
+
+        createImage(file) {
+            let reader = new FileReader();
+
+            reader.onload = () => {
+                this.filePreview = reader.result;
+            };
+            reader.readAsDataURL(file);
+        },
+
+        send() {
+            let post = {
+                text: this.text,
+                user_id: this.loggedUser.id
+            }
+
+            const formData = new FormData();
+            formData.append('user', JSON.stringify(post));
+            formData.append('file', this.file, this.file.name);
+
+            http.post('/posts/', formData)
+            .then(this.displayPopup = !this.displayPopup)
+            .catch(error => console.log(error));
+        }
     }
 }
 </script>

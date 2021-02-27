@@ -27,12 +27,11 @@ exports.getAllComments = (req, res, next) => {
 };
 
 exports.createComment = (req, res, next) => {    
-    console.log(req.params['post_id'])
     const comment = { 
         ...req.body,
         post_id: req.params.post_id
     };
-    console.log(comment);
+    
     models.comments.create(comment)
     .then(() => res.status(201).json({ message: 'Nouveau commentaire créé !'}))
     .catch(error => res.status(400).json({ error }));
@@ -57,6 +56,9 @@ exports.deleteComment = (req, res, next) => {
 
 exports.getCommentReactions = (req, res, next) => {
     models.comment_reactions.findAll({ 
+        where: {
+            comment_id: req.params.comment_id
+        },
         attributes: [
             [
                 sequelize.literal(`(
@@ -72,7 +74,8 @@ exports.getCommentReactions = (req, res, next) => {
                     WHERE has_liked = false AND comment_id = ${req.params.comment_id}            
                 )`), 'dislike'
             ]
-        ]
+        ],
+        group: 'comment_id'
     })
     .then(reactions => res.status(200).json(reactions))
     .catch(error => res.status(404).json({ error }));

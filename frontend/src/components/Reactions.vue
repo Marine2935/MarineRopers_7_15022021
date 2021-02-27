@@ -2,13 +2,13 @@
     <div class="d-flex" v-if="reactions">
         <p class="m-0">
             <span>{{ reactions[0].like }}</span>
-            <button class="border-0 bg-white btn-like" @click="react({ has_liked: true })">
+            <button class="border-0 btn-like button_bg" @click="react(true)">
                 <b-icon icon="hand-thumbs-up"></b-icon>
             </button>
         </p>
         <p class="m-0 ml-2">
             <span>{{ reactions[0].dislike }}</span>
-            <button class="border-0 bg-white btn-dislike" @click="react({ has_liked: false })">
+            <button class="border-0 btn-dislike button_bg" @click="react(false)">
                 <b-icon icon="hand-thumbs-down"></b-icon>
             </button>
         </p>
@@ -17,6 +17,7 @@
 
 <script>
 import http from '@/http';
+import { mapState } from "vuex";
 
 export default {
     name: 'Reactions',
@@ -30,41 +31,51 @@ export default {
         postId: Number,
         commentId: Number
     },
+    computed: {
+        ...mapState(['loggedUser'])                
+    },
     created() {
-        if (this.type == 'all_posts') {
-            http.get(`/posts/${this.postId}/reactions`)
-            .then(response=> this.reactions = response.data)
-            .catch(error => console.log(error)); 
-        }
+        http.get(this.defineUrl())
+            .then(response => {
+                this.reactions = response.data
 
-        if (this.type == 'single_post') {
-            http.get(`/posts/${this.$route.params.post_id}/reactions`)
-            .then(response=> this.reactions = response.data)
-            .catch(error => console.log(error)); 
-        }
-
-        if (this.type == 'comment') {
-            http.get(`/posts/${this.$route.params.post_id}/comments/${this.commentId}/reactions`)
-            .then(response=> this.reactions = response.data)
-            .catch(error => console.log(error)); 
-        }
-              
+                if (!this.reactions[0]) {
+                    this.reactions = [{like: 0, dislike: 0}] 
+                }               
+            })
+            .catch(error => console.log(error));            
     },
     methods: {
-        react(params) {
-            let payload = params
+        defineUrl() {
+            if (this.type == 'all_posts') {
+                return `/posts/${this.postId}/reactions` 
+            }
 
-            if (this.type == 'all_posts' || this.type == 'single_post') {
-                http.post(`/posts/${this.$route.params.post_id}/reactions`, payload)
-                .then(() =>  window.location.reload())
-                .catch(error => console.log(error));  
+            if (this.type == 'single_post') {
+                return `/posts/${this.$route.params.post_id}/reactions` 
             }
 
             if (this.type == 'comment') {
-                http.post(`/posts/${this.$route.params.post_id}/comments/${this.commentId}/reactions`, payload)
-                .then(() =>  window.location.reload())
-                .catch(error => console.log(error)); 
+                return `/posts/${this.$route.params.post_id}/comments/${this.commentId}/reactions`            
             }
+        },
+        react(params) {
+            let payload = {
+                has_liked: params,
+                user_id: this.loggedUser.id
+            };
+
+            http.post(this.defineUrl(), payload)
+            .then(() => {
+                if (params === true) {
+                    this.reactions[0].like++
+                }
+
+                if (params === false) {
+                    this.reactions[0].dislike++
+                }
+            })
+            .catch(error => console.log(error)); 
         }
     }
 }

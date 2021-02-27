@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const sequelize = require('../models/index');
+const fs = require('fs');
 
 const { models } = require('../models');
 
@@ -13,14 +14,14 @@ require('dotenv').config();
 let key = process.env.JWT_KEY;
 
 exports.signup = (req, res, next) => {
-    // Hachage du mot de passe avant qu'il soit envoyé à la base de données.
-    bcrypt.hash(req.body.password, 10)
-    .then(hash => {  
+    const userObject = JSON.parse(req.body.user);
+
+    // Hachage du mot de passe avant qu'il soit envoyé à la base de données.    
+    bcrypt.hash(userObject.password, 10)
+    .then(hash => {          
         models.users.create({
-            last_name: req.body.last_name,
-            first_name: req.body.first_name,
-            username: req.body.username,
-            email: req.body.email,
+            ...userObject,
+            avatar_url: `${req.protocol}://${req.get('host')}/files/${req.file.filename}`,
             password: hash
         })
         .then(() => res.status(201).json({ message: "Nouvel utilisateur créé !" }))
@@ -49,6 +50,7 @@ exports.login = (req, res, next) => {
             res.status(200).json({
                 id: user.id,
                 username: user.username,
+                avatar_url: user.avatar_url,
                 isAdmin: user.isAdmin,
                 token: jwt.sign(
                     { user: user.id },
@@ -112,7 +114,24 @@ exports.getUser = (req, res, next) => {
 };
 
 exports.modifyUser = (req, res, next) => {
+    models.users.findByPk(req.params.user_id)
+    .then(user => {
+        if (user.avatar_url) {
+           const filename = user.avatar_url.split('/files/')[1];
 
+            fs.unlink(`files/${filename}`, (error => {
+                if (error) throw error;
+            })); 
+        }        
+    })
+    .catch(error => res.status(404).json({ error }));
+
+    models.users.update(
+        { avatar_url: `${req.protocol}://${req.get('host')}/files/${req.file.filename}` },
+        { where: { id: req.params.user_id }}
+    )
+    .then(() => res.status(200).json({ message: "Profil utilisateur modifié !" }))
+    .catch(error => res.status(400).json({ error }));
 };
 
 exports.deleteAccount = (req, res, next) => {

@@ -4,7 +4,7 @@
             <div class="test col-8 bg-white rounded shadow-sm p-3 my-3">
                 <div class="d-flex justify-content-between">
                     <div class="d-flex text-left">
-                        <b-avatar></b-avatar><!-- image profil -->
+                        <b-avatar :src="post.user.avatar_url" size="3rem"></b-avatar>
                         <div class="ml-3">
                             <router-link class="font-weight-bold m-0 username" title="Voir tous ses posts" :to="{ name: 'UserPosts', params: { user_id: `${post.user.id}`, username: `${post.user.username}` } }">
                                 {{ post.user.username }}

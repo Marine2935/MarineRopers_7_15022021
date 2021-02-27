@@ -4,7 +4,7 @@
             <div class="test col-8 bg-white rounded shadow-sm p-3 my-3" v-if="post">
                 <div class="d-flex justify-content-between">
                     <div class="d-flex text-left">
-                        <b-avatar></b-avatar><!-- image profil -->
+                        <b-avatar :src="post.user.avatar_url" size="3rem"></b-avatar><!-- image profil -->
                         <div class="ml-3">
                             <p class="font-weight-bold m-0">{{ post.user.username }}</p>
                             <p class="m-0">

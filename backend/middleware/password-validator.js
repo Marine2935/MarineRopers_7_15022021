@@ -13,8 +13,10 @@ schema
 
 
 module.exports = (req, res, next) => {
+    const userObject = JSON.parse(req.body.user);
+
     try {        
-        if (schema.validate(req.body.password)) {
+        if (schema.validate(userObject.password)) {
             next();
         } else {
             throw 'Invalid password !';

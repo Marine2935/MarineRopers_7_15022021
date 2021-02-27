@@ -66,6 +66,10 @@ a {
     height: 40px;
 }
 
+.button_bg {
+    background-color: transparent;
+}
+
 .btn:focus {
     box-shadow: unset!important;
 }

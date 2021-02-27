@@ -75,7 +75,7 @@ exports.modifyPost = (req, res, next) => {
     if (req.file) {        
         models.posts.findByPk(req.params.post_id)
         .then(post => {
-            if (post !== NULL) {
+            if (post.file_name) {
                 const filename = post.file_name.split('/files/')[1];
 
                 fs.unlink(`files/${filename}`, error => {
@@ -103,23 +103,27 @@ exports.deletePost = (req, res, next) => {
     // Suppression du fichier stocké dans le dossier files puis suppression du post.
     models.posts.findByPk(req.params.post_id)
     .then(post => {
-        if (post !== NULL) {
+        console.log(post.file_name)
+        if (post.file_name) {
             const filename = post.file_name.split('/files/')[1];
 
             fs.unlink(`files/${filename}`, error => {
                 if (error) throw error;
             });
         };
-    })
-    .catch(error => res.status(404). json({ error }));        
 
-    models.posts.destroy({ where: { id: req.params.post_id } })
-    .then(() => res.status(200).json({ message: 'Post supprimé !'}))
-    .catch(error => res.status(500).json({ error }));
+        models.posts.destroy({ where: { id: req.params.post_id } })
+        .then(() => res.status(200).json({ message: 'Post supprimé !'}))
+        .catch(error => res.status(500).json({ error }));
+    })
+    .catch(error => res.status(404). json({ error }));  
 };
 
 exports.getPostReactions = (req, res, next) => {
     models.post_reactions.findAll({ 
+        where: {
+            post_id: req.params.post_id
+        },
         attributes: [
             [
                 sequelize.literal(`(
