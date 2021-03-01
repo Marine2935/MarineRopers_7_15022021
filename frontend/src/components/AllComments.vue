@@ -1,16 +1,18 @@
 <template>
-    <div class="container mt-4">
+    <div class="container">
         <div class="row justify-content-center" v-for="comment in comments" :key="comment.id">
             <div class="col-1 my-3 pt-1">
-                <b-avatar></b-avatar><!-- image profil -->                
+                <b-avatar :src="comment.user.avatar_url"></b-avatar>              
             </div>
             <div class="test col-7 my-2">
                 <div class="row bg-white rounded shadow-sm p-3">
                     <div class="col pl-1">
                         <div class="text-left align-items-center">                    
-                            <p class="font-weight-bold m-0">{{ comment.user.username }}</p>                    
+                            <router-link class="font-weight-bold m-0 username" title="Voir tous ses posts" :to="{ name: 'UserPosts', params: { user_id: `${comment.user.id}`, username: `${comment.user.username}` } }">
+                                {{ comment.user.username }}
+                            </router-link>                   
                         </div>
-                        <div class="mb-2">
+                        <div class="my-2 text-left">
                             {{ comment.text }}
                         </div>
                     </div>
@@ -18,7 +20,7 @@
                 <div class="row justify-content-between mt-2"> 
                     <div class="col text-left d-flex ">
                         <Reactions :type="'comment'" :commentId="comment.id"/>
-                        <button class="border-0 font-weight-bold text-dark button ml-3">Répondre</button>
+                        <!--<button class="border-0 font-weight-bold text-dark button ml-3">Répondre</button>-->
                     </div>
                     <div class="col text-right">
                         <span v-if="comment.date_comment_sec < 60">{{ comment.date_comment_sec }}s</span>

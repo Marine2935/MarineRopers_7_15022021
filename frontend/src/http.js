@@ -5,7 +5,7 @@ const http = axios.create({
 
 http.interceptors.request.use(function(config) {
     const token = sessionStorage.getItem('token');
-    config.headers.Authorization = token ? `Bearer ${token}` : 'abc';
+    config.headers.Authorization = token ? `Bearer ${token}` : 'UNVALID TOKEN';
     return config;
 });
 

@@ -73,4 +73,8 @@ a {
 .btn:focus {
     box-shadow: unset!important;
 }
+
+.username:hover {
+    text-decoration: underline!important;
+}
 </style>

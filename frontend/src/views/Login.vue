@@ -1,7 +1,7 @@
 <template>
   <div class="login container my-5">
     <h1>Connexion</h1>
-    <form method="get" class="mx-auto mt-5 mb-3 w-50">
+    <form class="mx-auto mt-5 mb-3 w-50" @submit.prevent="login">
         <div class="form-group my-3">    
             <label for="username">Nom d'utilisateur</label><br>        
             <input class="form-control rounded" type="text" name="username" v-model="username" required>
@@ -10,11 +10,9 @@
             <label for="password">Mot de passe</label><br>
             <input class="form-control rounded" type="password" name="password" v-model="password" required>
             <a class="forgot_pass" @click="alert"><p class="text-right pt-2 pr-2">Mot de passe oublié ?</p></a>
-        </div>                
+        </div>    
+        <button type="submit" class="bg-dark text-white rounded-pill m-4 px-4 py-2">Connexion</button>            
     </form>  
-        <div>
-            <button class="bg-dark text-white rounded-pill m-4 px-4 py-2" @click="login">Connexion</button> 
-        </div>  
     <p class="mt-4">Première visite ? <router-link to="/signup" class="font-weight-bold text-info">Créez votre compte</router-link> !</p>
   </div>
 </template>
@@ -32,9 +30,8 @@ export default {
         }
     },
     methods: {
-        ...mapMutations([
-            'initUser'
-        ]),
+        ...mapMutations(['initUser']),
+        
         login() {              
             let payload = {
                 username: this.username,

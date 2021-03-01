@@ -8,7 +8,8 @@ module.exports = (sequelize) => {
             autoIncrement: true
         },
         text: DataTypes.TEXT,
-        file_url: DataTypes.STRING,            
+        file_url: DataTypes.STRING,
+        link_url: DataTypes.TEXT,            
         user_id: {
             type: DataTypes.INTEGER.UNSIGNED,
             allowNull: false

@@ -27,7 +27,7 @@
             <label for="avatar">Image de profil</label><br>  
             <div class="d-flex justify-content-around align-items-center">                        
                 <div class="mt-2 mb-3" v-if="imagePreview">
-                    <b-avatar :src="this.imagePreview" size="6rem"></b-avatar>    
+                    <b-avatar :src="imagePreview" size="6rem"></b-avatar>    
                 </div> 
                 <input type="file" name="avatar" accept="image/png, image/jpg, image/jpeg " @change="onFileUpload">  
             </div> 

@@ -17,11 +17,11 @@ app.use((req, res, next) => {
   next();
 });
 
-// Limitation du nombre de requêtes à 100 par tranche de 10min.
+// Limitation du nombre de requêtes à 1000 par tranche de 10min.
 const rateLimit = require('express-rate-limit');
 const limiter = rateLimit({    
     windowMs: 10*60*1000,
-    max: 100,
+    max: 1000,
     message: 'Too many requests, please try again later.'
 });
 

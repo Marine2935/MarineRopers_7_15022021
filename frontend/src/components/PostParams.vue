@@ -1,8 +1,8 @@
 <template>
     <div>
-        <b-dropdown data-toggle="dropdown" block variant="link" id="dropdown-offset" offset="-110" toggle-class="text-decoration-none" no-caret>
+        <b-dropdown data-toggle="dropdown" block variant="link" id="dropdown-offset" offset="-110" toggle-class="text-decoration-none" no-caret v-if="post_id">
             <template #button-content><b-icon icon="gear" font-scale="0.9"></b-icon></template>
-            <b-dropdown-item class="text-dark py-1 menu-post" @click="editPost"><b-icon class="mr-2" icon="pencil-square" font-scale="0.9"></b-icon>Modifier le post</b-dropdown-item>
+            <b-dropdown-item class="text-dark py-1 menu-post" @click="displayPopup(); definePost(post_id);"><b-icon class="mr-2" icon="pencil-square" font-scale="0.9"></b-icon>Modifier le post</b-dropdown-item>
             <b-dropdown-item class="text-dark py-1 menu-post" @click="deletePost"><b-icon class="mr-2" icon="trash" font-scale="0.9"></b-icon>Supprimer le post</b-dropdown-item>
         </b-dropdown>
     </div>
@@ -10,6 +10,8 @@
 
 <script>
 import http from '@/http';
+import { mapMutations } from "vuex";
+import { mapActions } from "vuex";
 
 export default {
     name: 'PostParams',
@@ -17,9 +19,10 @@ export default {
         post_id: Number
     },
     methods: {
-        editPost() {
+        ...mapMutations(['definePost']),
 
-        },
+        ...mapActions([ 'displayPopup' ]),
+
         deletePost() {
             http.delete(`/posts/${this.post_id}`)
             .then(() => {

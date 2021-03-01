@@ -58,15 +58,15 @@ exports.getOnePost = (req, res, next) => {
     .catch(error => res.status(404).json({ error }));
 };
 
-exports.createPost = (req, res, next) => {
-    const post = req.file ?                                                                       // revoir la création de l'objet avec le file
+exports.createPost = (req, res, next) => {    
+    const post = req.file ?                                                                       
         ({
-            ...req.body,
-            file_name: `${req.protocol}://${req.get('host')}/files/${req.file.filename}`
+            ...JSON.parse(req.body.post),
+            file_url: `${req.protocol}://${req.get('host')}/files/${req.file.filename}`
         }) : ({ ...req.body });
     
     models.posts.create(post)
-    .then(() => res.status(201).json({ message: 'Nouveau post créé !'}))
+    .then(post => res.status(201).json({ message: 'Nouveau post créé !', post: post}))
     .catch(error => res.status(400).json({ error }));
 };
 
@@ -75,8 +75,8 @@ exports.modifyPost = (req, res, next) => {
     if (req.file) {        
         models.posts.findByPk(req.params.post_id)
         .then(post => {
-            if (post.file_name) {
-                const filename = post.file_name.split('/files/')[1];
+            if (post.file_url) {
+                const filename = post.file_url.split('/files/')[1];
 
                 fs.unlink(`files/${filename}`, error => {
                     if (error) throw error;
@@ -85,16 +85,14 @@ exports.modifyPost = (req, res, next) => {
         })
         .catch(error => res.status(404). json({ error }));
     };
-
-    const postObject = JSON.parse(req.body.post);
     
-    const post = req.file ?                                                                       // revoir la création de l'objet avec le file
+    const post = req.file ?                                                                       
         ({
-            ...postObject,
-            file_name: `${req.protocol}://${req.get('host')}/files/${req.file.filename}`
+            ...req.body.post,
+            file_url: `${req.protocol}://${req.get('host')}/files/${req.file.filename}`
         }) : ({ ...req.body });
 
-    models.posts.update(post, { where: { id: postId } })
+    models.posts.update(post, { where: { id: req.params.post_id } })
     .then(() => res.status(200).json({ message: 'Post modifié !' }))
     .catch(error => res.status(400).json({ error }));
 };
@@ -103,9 +101,8 @@ exports.deletePost = (req, res, next) => {
     // Suppression du fichier stocké dans le dossier files puis suppression du post.
     models.posts.findByPk(req.params.post_id)
     .then(post => {
-        console.log(post.file_name)
-        if (post.file_name) {
-            const filename = post.file_name.split('/files/')[1];
+        if (post.file_url) {
+            const filename = post.file_url.split('/files/')[1];
 
             fs.unlink(`files/${filename}`, error => {
                 if (error) throw error;
@@ -124,7 +121,8 @@ exports.getPostReactions = (req, res, next) => {
         where: {
             post_id: req.params.post_id
         },
-        attributes: [
+        attributes: {
+            include: [
             [
                 sequelize.literal(`(
                     SELECT COUNT('has_liked') 
@@ -139,8 +137,7 @@ exports.getPostReactions = (req, res, next) => {
                     WHERE has_liked = false AND post_id = ${req.params.post_id}            
                 )`), 'dislike'
             ]
-        ],
-        group: 'post_id'
+        ]}
     })
     .then(reactions => res.status(200).json(reactions))
     .catch(error => res.status(404).json({ error }));

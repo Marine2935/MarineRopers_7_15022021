@@ -10,19 +10,32 @@ export default new Vuex.Store({
             username: null,
             avatarUrl: null,
             isAdmin: false
-        }
+        },
+        popup: false,
+        postId: null
     },
     mutations: {
         initUser(state, user) {
             state.loggedUser.id = user.id;
             state.loggedUser.username = user.username;
             state.loggedUser.avatarUrl = user.avatar_url;
-            if (user.isAdmin) {
-                state.loggedUser.isAdmin = user.isAdmin
-            }            
-        } 
+            state.loggedUser.isAdmin = user.isAdmin;
+        },
+        changePopup(state) {
+            state.popup = !state.popup
+        },
+        definePost(state, post_id) {
+            if (post_id) {
+               state.postId = post_id; 
+            } else {
+                state.postId = null;
+            }
+        }   
     },
     actions: {
+        displayPopup(context) {
+            context.commit('changePopup');
+        }
     },
     modules: {
     }

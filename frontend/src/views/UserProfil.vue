@@ -16,7 +16,7 @@
                 <form class="justify-content-center my-3" v-if="displayModify" @submit.prevent="updateProfil">                    
                     <div class="d-flex justify-content-around align-items-center ml-3" v-if="imagePreview">                        
                         <div class="mb-3">
-                            <b-avatar :src="this.imagePreview" size="6rem"></b-avatar>
+                            <b-avatar :src="imagePreview" size="6rem"></b-avatar>
                         </div> 
                     </div> 
                     <input type="file" name="avatar" accept="image/png, image/jpg, image/jpeg " @change="onFileUpload"><br>
