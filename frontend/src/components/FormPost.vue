@@ -2,47 +2,47 @@
     <div class="mt-5">               
         <div class="popup justify-content-center align-items-center" v-if="popup">
             <div class="popup__container p-4 shadow">
-                <button class="btn_close p-2" @click="displayPopup(); definePost()">
+                <button class="btn_close p-2" @click="togglePopup(); definePost()">
                     <b-icon icon="x-circle" font-scale="1.5"></b-icon>
                 </button>
                 <h3><span v-if="postId">Modifier ce post</span><span v-else>Créer un nouveau post</span></h3><hr>
                 <div class="text-left">
-                    <p>
+                    <p class="m-0">
                         <b-avatar :src="loggedUser.avatarUrl" size="3rem"></b-avatar>
                         <span class="ml-3">{{ loggedUser.username }}</span>
                     </p>
                 </div>
                 <form @submit.prevent="send">
                     <div class="form-group">
-                        <!--<label>Contenu du post</label><br>-->
-                        <textarea class="form-control border-light" name="text_post" rows="2" cols="50" placeholder="Que voulez vous dire?" v-model="text"></textarea>
+                        <label class="m-0" for="text_post">Contenu du post</label><br>
+                        <textarea class="form-control border-light textinput" name="text_post" id="text_post" rows="4" cols="60" placeholder="Que voulez vous dire?" v-model="text"></textarea>
                     </div>
                     <div>
                         <div class="d-flex justify-content-between align-items-center">
-                            <p class="m-0">Ajouter à votre post :</p>
+                            <p class="m-0 mb-2">Ajouter à votre post :</p>
                             <div>
                                 <a class="mr-3" @click="addFile = !addFile; addLink = false"><b-icon icon="images" variant="success" font-scale="1.5"></b-icon></a>
                                 <a @click="addLink = !addLink; addFile = false"><b-icon icon="youtube" variant="danger" font-scale="1.5"></b-icon></a>
                                 <!--<a @click="addLink = !addLink; addFile = false"><b-icon icon="link" variant="info" font-scale="1.5"></b-icon></a>-->
                             </div>
                         </div>
-                        <div class="form-group d-block" v-if="addFile">    
+                        <div class="form-group" v-if="addFile">    
                             <label for="file">Image / Vidéo</label><br>
                             <div class="mt-1 mb-3" v-if="filePreview">
                                 <img :src="filePreview" height="100" v-if="file.type === 'image/jpg' || file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/gif'" />
                                 <iframe :src="filePreview" v-else></iframe>    
                             </div>        
-                            <input type="file" name="file" accept="image/png, image/gif, image/jpeg, image/jpg video/mp4, video/quicktime, application/pdf" @change="onFileUpload">
+                            <input type="file" name="file" id="file" accept="image/png, image/gif, image/jpeg, image/jpg video/mp4, video/quicktime, application/pdf" @change="onFileUpload">
                         </div>
                         <div class="form-group" v-if="addLink">    
-                            <label for="file">Ajouter un lien Youtube</label><br>                                   
-                            <textarea class="form-control border-light" name="url" placeholder="Url" rows="1" @change="getUrl"></textarea>
-                            <div class="mt-2 mb-3" v-if="link">
+                            <label for="url">Ajouter un lien Youtube</label><br>                                   
+                            <textarea class="form-control border-light textinput" name="url" id="url" rows="1" placeholder="Url" @change="getUrl"></textarea>
+                            <div class="mt-2" v-if="link">
                                 <iframe :src="link"></iframe>    
                             </div>               
                         </div>
                     </div>
-                    <button type="submit" class="bg-dark text-white rounded-pill mt-3 px-4 py-2">Envoyer</button>
+                    <button type="submit" class="bg-dark text-white rounded-pill px-4 py-2">Envoyer</button>
                 </form>
             </div>
         </div>
@@ -68,7 +68,7 @@ export default {
             post: null
         }
     },
-    updated() {
+    beforeMount() {
         if (this.postId) {
             http.get(`/posts/${this.postId}`)
             .then(response => {
@@ -88,12 +88,12 @@ export default {
         }
     },
     computed: {
-        ...mapState([ 'loggedUser', 'popup', 'postId' ])        
+        ...mapState(['loggedUser', 'popup', 'postId'])        
     },
     methods: {
         ...mapMutations(['definePost']),
 
-        ...mapActions([ 'displayPopup' ]),
+        ...mapActions(['togglePopup']),
         
         getEmbedUrl(url) {
             let ytId = url.match(/youtu\.be\/([a-zA-Z0-9_-]+)/);
@@ -125,46 +125,36 @@ export default {
         },
 
         send() {
-            let post = {
+            const post = {
                 text: this.text,
                 link_url: this.link,
-                user_id: this.loggedUser.id
-            }
+                loggedUser: this.loggedUser
+            };
+
+            const formData = new FormData();
             
             if (this.file) {
-                const formData = new FormData();
-                formData.append('user', JSON.stringify(post));
+                formData.append('post', JSON.stringify(post));
                 formData.append('file', this.file, this.file.name);
+            }
 
-                if (this.postId) {
-                    http.put(`/posts/${this.postId}`, formData)
-                    .then(this.displayPopup)
-                    .catch(error => console.log(error));
-                } else {
-                    http.post('/posts/', formData)
-                    .then(response => {
-                        console.log(response.data)
-                        this.displayPopup
-                    })
-                    .catch(error => console.log(error));
-                }
+            const payload = this.file ? (formData) : (post);
+
+            if (this.postId) {
+                http.put(`/posts/${this.postId}`, payload)
+                .then(response => {
+                    this.$emit("added", response.data.post)
+                    this.togglePopup
+                })
+                .catch(error => console.log(error));
             } else {
-                if (this.postId) {
-                    http.put(`/posts/${this.postId}`, post)
-                    .then(response => {
-                        console.log(response.data)
-                        this.displayPopup
-                    } )
-                    .catch(error => console.log(error));
-                } else {
-                    http.post('/posts/', post)
-                    .then(response => {
-                        this.$emit("added", response.data.post)
-                        this.displayPopup
-                    })
-                    .catch(error => console.log(error));
-                }
-            }            
+                http.post('/posts/', payload)
+                .then(response => {
+                    this.$emit("added", response.data.post)
+                    this.togglePopup
+                })
+                .catch(error => console.log(error));
+            }           
         }
     }
 }
@@ -189,7 +179,7 @@ export default {
         min-width: 30%;
         max-width: 100%;
         min-height: 25%;
-        max-height: 60%;
+        max-height: 80%;
     }
 }
 
@@ -200,5 +190,11 @@ export default {
     position: absolute;
     top: 0;
     right: 0;
+}
+
+.textinput {
+    width: 100%;
+    outline: none;
+    resize: none;
 }
 </style>

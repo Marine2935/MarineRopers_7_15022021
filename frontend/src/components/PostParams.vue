@@ -2,14 +2,19 @@
     <div>
         <b-dropdown data-toggle="dropdown" block variant="link" id="dropdown-offset" offset="-110" toggle-class="text-decoration-none" no-caret v-if="post_id">
             <template #button-content><b-icon icon="gear" font-scale="0.9"></b-icon></template>
-            <b-dropdown-item class="text-dark py-1 menu-post" @click="displayPopup(); definePost(post_id);"><b-icon class="mr-2" icon="pencil-square" font-scale="0.9"></b-icon>Modifier le post</b-dropdown-item>
-            <b-dropdown-item class="text-dark py-1 menu-post" @click="deletePost"><b-icon class="mr-2" icon="trash" font-scale="0.9"></b-icon>Supprimer le post</b-dropdown-item>
+            <b-dropdown-item class="text-dark py-1 menu-post" @click="togglePopup(); definePost(post_id);">
+                <b-icon class="mr-2" icon="pencil-square" font-scale="0.9"></b-icon>Modifier le post
+            </b-dropdown-item>
+            <b-dropdown-item class="text-dark py-1 menu-post" @click="deletePost">
+                <b-icon class="mr-2" icon="trash" font-scale="0.9"></b-icon>Supprimer le post
+            </b-dropdown-item>
         </b-dropdown>
     </div>
 </template>
 
 <script>
 import http from '@/http';
+import { mapState } from "vuex";
 import { mapMutations } from "vuex";
 import { mapActions } from "vuex";
 
@@ -18,13 +23,16 @@ export default {
     props: {
         post_id: Number
     },
+    computed: {
+        ...mapState(['loggedUser'])        
+    },
     methods: {
         ...mapMutations(['definePost']),
 
-        ...mapActions([ 'displayPopup' ]),
+        ...mapActions(['togglePopup']),
 
         deletePost() {
-            http.delete(`/posts/${this.post_id}`)
+            http.delete(`/posts/${this.post_id}/${this.loggedUser.id}/${this.loggedUser.isAdmin}`)
             .then(() => {
                 if (this.$router.currentRoute.path !== '/feed')
                 this.$router.push('/feed')

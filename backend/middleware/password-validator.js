@@ -13,7 +13,7 @@ schema
 
 
 module.exports = (req, res, next) => {
-    const userObject = JSON.parse(req.body.user);
+    const userObject = req.file ? ({...JSON.parse(req.body.user)}) : ({...req.body});
 
     try {        
         if (schema.validate(userObject.password)) {

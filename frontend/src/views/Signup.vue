@@ -4,23 +4,23 @@
     <form class="mx-auto m-3 mt-5 w-50" @submit.prevent="signup">        
         <div class="form-group my-3">    
             <label for="lastName">Nom</label><br>        
-            <input class="form-control rounded" type="text" name="lastName" v-model="last_name" required>
+            <input class="form-control rounded" type="text" name="lastName" id="lastName" v-model="last_name" required>
         </div>
         <div class="form-group my-3">    
             <label for="firstName">Prénom</label><br>        
-            <input class="form-control rounded" type="text" name="firstName" v-model="first_name" required>
+            <input class="form-control rounded" type="text" name="firstName" id="firstName" v-model="first_name" required>
         </div>
         <div class="form-group my-3">    
             <label for="username">Nom d'utilisateur</label><br>        
-            <input class="form-control rounded" type="text" name="username" v-model="username" required>
+            <input class="form-control rounded" type="text" name="username" id="username" v-model="username" required>
         </div>
         <div class="form-group my-3">
             <label for="email">Adresse mail</label><br>
-            <input class="form-control rounded" type="email" name="email" v-model="email" required >
+            <input class="form-control rounded" type="email" name="email" id="email" v-model="email" required >
         </div>
         <div class="form-group my-3">
             <label for="password">Mot de passe</label><br>
-            <input class="form-control rounded" type="password" name="password" aria-describedby="passwordHelp" v-model="password" required>
+            <input class="form-control rounded" type="password" name="password" id="password" aria-describedby="passwordHelp" v-model="password" required>
             <small id="passwordHelp" class="form-text text-muted">Doit contenir au moins 8 caractères dont une minuscule, une majuscule, un chiffre et un caractère spécial.</small>
         </div>
         <div class="form-group my-3">
@@ -29,7 +29,7 @@
                 <div class="mt-2 mb-3" v-if="imagePreview">
                     <b-avatar :src="imagePreview" size="6rem"></b-avatar>    
                 </div> 
-                <input type="file" name="avatar" accept="image/png, image/jpg, image/jpeg " @change="onFileUpload">  
+                <input type="file" name="avatar" id="avatar" accept="image/png, image/jpg, image/jpeg " @change="onFileUpload">  
             </div> 
         </div>
         <button type="submit" class="bg-dark text-white rounded-pill m-4 px-4 py-2">Inscription</button>
@@ -84,20 +84,24 @@ export default {
             };  
 
             const formData = new FormData();
-            formData.append('user', JSON.stringify(user));
-            formData.append('file', this.file, this.file.name);
+            if (this.file) {
+                formData.append('user', JSON.stringify(user));
+                formData.append('file', this.file, this.file.name);
+            }
+            
+            const payload = this.file ? (formData) : (user);
               
-            http.post('/users/signup', formData)
+            http.post('/users/signup', payload)
             .then(() => {
                 http.post('/users/login', user)
                 .then(response => {
-                    this.initUser(response.data)
-                    sessionStorage.setItem('token', response.data.token)
-                    this.$router.push('/feed')
+                    this.initUser(response.data);
+                    sessionStorage.setItem('token', response.data.token);
+                    this.$router.push('/feed');
                 })
                 .catch(error => {
                     sessionStorage.removeItem('token');
-                    console.log(error)
+                    console.log(error);
                 });
             })
             .catch(error => console.log(error));

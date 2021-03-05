@@ -8,7 +8,7 @@
                 <div class="col-8 text-left bg-white d-flex rounded shadow-sm p-3 align-items-center">
                     <b-avatar :src="loggedUser.avatarUrl" size="3rem"></b-avatar>
                     <div class="w-100 ml-3">
-                        <button class="px-4 py-2 rounded-pill border-0 text-left text-secondary w-100" @click="displayPopup(); definePost();">
+                        <button class="px-4 py-2 rounded-pill border-0 text-left text-secondary w-100" @click="togglePopup(); definePost();">
                             Que voulez-vous dire, {{ loggedUser.username }} ?
                         </button>
                     </div>
@@ -58,7 +58,7 @@ export default {
     methods: {
         ...mapMutations(['definePost']),
 
-        ...mapActions(['displayPopup']),
+        ...mapActions(['togglePopup']),
 
         add(post) {
             this.posts.push(post)

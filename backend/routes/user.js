@@ -9,9 +9,10 @@ const userCtrl = require('../controllers/user');
 
 router.post('/signup', multer, validate, userCtrl.signup);
 router.post('/login', userCtrl.login);
-router.get('/:user_id', auth, userCtrl.getUser);
+router.get('/', auth, userCtrl.getAllUsers);
+router.get('/:user_id', auth, userCtrl.getOneUser);
 router.put('/:user_id', auth, multer, userCtrl.modifyUser);
-router.delete('/:user_id', auth, userCtrl.deleteAccount);
+router.delete('/:user_id/:is_admin', auth, userCtrl.deleteAccount);
 router.get('/:user_id/posts', auth, userCtrl.getUserPosts);
 
 module.exports = router;

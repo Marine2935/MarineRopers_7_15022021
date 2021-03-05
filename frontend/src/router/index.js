@@ -25,6 +25,11 @@ const routes = [
         component: () => import('../views/SinglePost.vue')
     },
     {
+        path: '/users',
+        name: 'Users',
+        component: () => import('../views/Users.vue')
+    },
+    {
         path: '/users/:user_id/:username/profil',
         name: 'UserProfil',
         component: () => import('../views/UserProfil.vue')
@@ -33,7 +38,7 @@ const routes = [
         path: '/users/:user_id/:username/posts',
         name: 'UserPosts',
         component: () => import('../views/UserPosts.vue')
-    } 
+    }
 ]
 
 const router = new VueRouter({

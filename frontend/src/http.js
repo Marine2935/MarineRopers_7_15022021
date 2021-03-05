@@ -4,8 +4,8 @@ const http = axios.create({
 })
 
 http.interceptors.request.use(function(config) {
-    const token = sessionStorage.getItem('token');
-    config.headers.Authorization = token ? `Bearer ${token}` : 'UNVALID TOKEN';
+    const authObject = JSON.parse(localStorage.getItem('vuex'));
+    config.headers.Authorization = authObject ? `Bearer ${authObject.loggedUser.token}` : 'UNVALID TOKEN';
     return config;
 });
 

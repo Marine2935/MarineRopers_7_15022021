@@ -3,10 +3,16 @@
         <div class="row justify-content-center">
             <div class="col-8 bg-white rounded shadow-sm p-3 d-flex align-items-center">
                 <b-avatar :src="loggedUser.avatarUrl" size="3rem"></b-avatar>
-                <form class="d-flex ml-4" @submit.prevent="sendComment">
-                    <!--<label class="m-0">Commentaire</label>-->
-                    <textarea class="form-control" name="text_post" rows="1" placeholder="Votre commentaire" v-model="text" required></textarea>  
-                    <button type="submit" class="bg-dark text-white rounded-pill ml-4 px-2 py-1">Commenter</button>                  
+                <form class="w-100 text-center ml-4" @submit.prevent="sendComment">
+                    <label for="text_post" class="m-0 mb-2">Ajouter un commentaire</label>  
+                    <div class="container_comment d-flex align-items-center">                  
+                        <div class="comment">
+                            <textarea class="form-control textinput" name="text_post" id="text_post" placeholder="Votre commentaire" v-model="text" required></textarea> 
+                        </div>  
+                        <div>
+                            <button type="submit" class="bg-dark text-white rounded-pill ml-3 px-2 py-2">Commenter</button>   
+                        </div> 
+                    </div>
                 </form>                
             </div>
         </div>
@@ -41,3 +47,23 @@ export default {
     }
 }
 </script>
+
+<style lang="scss">
+.container_comment {
+    max-width: 820px;
+    margin: 0px auto;
+}
+
+.comment {
+    float: left;
+    width: 100%;
+    height: auto;
+}
+
+.textinput {
+    float: left;
+    width: 100%;
+    outline: none;
+    resize: none;
+}
+</style>

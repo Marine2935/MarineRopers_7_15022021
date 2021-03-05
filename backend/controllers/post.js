@@ -71,49 +71,66 @@ exports.createPost = (req, res, next) => {
 };
 
 exports.modifyPost = (req, res, next) => {
-    // Si modification du fichier, suppression du fichier initialement stocké dans le dossier files puis mise à jour du post.
-    if (req.file) {        
-        models.posts.findByPk(req.params.post_id)
-        .then(post => {
-            if (post.file_url) {
-                const filename = post.file_url.split('/files/')[1];
+    models.posts.findByPk(req.params.post_id)
+    .then(post => {
+        const postObject = req.file ? ({...JSON.parse(req.body.post)}) : ({...req.body})
 
-                fs.unlink(`files/${filename}`, error => {
-                    if (error) throw error;
-                });
+        // Vérification que l'utilisateur qui veut modifier le post est bien son auteur ou un modérateur.
+        if (postObject.loggedUser.id === post.user_id || postObject.loggedUser.isAdmin) {
+            // Si modification du fichier, suppression du fichier initialement stocké dans le dossier files puis mise à jour du post.
+            if (req.file) {        
+                models.posts.findByPk(req.params.post_id)
+                .then(post => {
+                    if (post.file_url) {
+                        const filename = post.file_url.split('/files/')[1];
+
+                        fs.unlink(`files/${filename}`, error => {
+                            if (error) throw error;
+                        });
+                    };
+                })
+                .catch(error => res.status(404). json({ error }));
             };
-        })
-        .catch(error => res.status(404). json({ error }));
-    };
-    
-    const post = req.file ?                                                                       
-        ({
-            ...req.body.post,
-            file_url: `${req.protocol}://${req.get('host')}/files/${req.file.filename}`
-        }) : ({ ...req.body });
+            
+            const post = req.file ?                                                                       
+                ({
+                    ...req.body.post,
+                    file_url: `${req.protocol}://${req.get('host')}/files/${req.file.filename}`
+                }) : ({ ...req.body });
 
-    models.posts.update(post, { where: { id: req.params.post_id } })
-    .then(() => res.status(200).json({ message: 'Post modifié !' }))
-    .catch(error => res.status(400).json({ error }));
+            models.posts.update(post, { where: { id: req.params.post_id } })
+            .then(() => res.status(200).json({ message: 'Post modifié !' }))
+            .catch(error => res.status(400).json({ error }));
+        }
+    })
+    .catch(error => res.status(404).json({ error }));
 };
 
 exports.deletePost = (req, res, next) => {
-    // Suppression du fichier stocké dans le dossier files puis suppression du post.
-    models.posts.findByPk(req.params.post_id)
+     models.posts.findByPk(req.params.post_id)
     .then(post => {
-        if (post.file_url) {
-            const filename = post.file_url.split('/files/')[1];
+        // Vérification que l'utilisateur qui veut supprimer le post est bien son auteur ou un modérateur.
+        if (req.params.user_id === post.user_id || req.params.is_admin) {
+           // Suppression du fichier stocké dans le dossier files puis suppression du post.
+            models.posts.findByPk(req.params.post_id)
+            .then(post => {
+                if (post.file_url) {
+                    const filename = post.file_url.split('/files/')[1];
 
-            fs.unlink(`files/${filename}`, error => {
-                if (error) throw error;
-            });
-        };
+                    fs.unlink(`files/${filename}`, error => {
+                        if (error) throw error;
+                    });
+                };
 
-        models.posts.destroy({ where: { id: req.params.post_id } })
-        .then(() => res.status(200).json({ message: 'Post supprimé !'}))
-        .catch(error => res.status(500).json({ error }));
+                models.posts.destroy({ where: { id: req.params.post_id } })
+                .then(() => res.status(200).json({ message: 'Post supprimé !'}))
+                .catch(error => res.status(500).json({ error }));
+            })
+            .catch(error => res.status(404). json({ error }));   
+        }
     })
-    .catch(error => res.status(404). json({ error }));  
+    .catch(error => res.status(404).json({ error }))
+    
 };
 
 exports.getPostReactions = (req, res, next) => {

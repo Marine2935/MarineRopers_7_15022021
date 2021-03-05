@@ -4,12 +4,12 @@
     <form class="mx-auto mt-5 mb-3 w-50" @submit.prevent="login">
         <div class="form-group my-3">    
             <label for="username">Nom d'utilisateur</label><br>        
-            <input class="form-control rounded" type="text" name="username" v-model="username" required>
+            <input class="form-control rounded" type="text" name="username" id="username" v-model="username" required>
         </div>
         <div class="form-group my-3">
             <label for="password">Mot de passe</label><br>
-            <input class="form-control rounded" type="password" name="password" v-model="password" required>
-            <a class="forgot_pass" @click="alert"><p class="text-right pt-2 pr-2">Mot de passe oublié ?</p></a>
+            <input class="form-control rounded" type="password" name="password" id="password" v-model="password" required>
+            <p class="text-right pt-2 pr-2"><a class="forgot_pass" @click="alert">Mot de passe oublié ?</a></p>
         </div>    
         <button type="submit" class="bg-dark text-white rounded-pill m-4 px-4 py-2">Connexion</button>            
     </form>  
@@ -40,11 +40,10 @@ export default {
             http.post('/users/login', payload)
             .then(response => {
                 this.initUser(response.data)
-                sessionStorage.setItem('token', response.data.token)
                 this.$router.push('/feed')
             })
             .catch(error => {
-                sessionStorage.removeItem('token');
+                localStorage.removeItem('vuex');
                 console.log(error)
             });
         },

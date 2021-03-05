@@ -49,9 +49,16 @@ exports.createComment = (req, res, next) => {
 // };
 
 exports.deleteComment = (req, res, next) => {
-    models.comments.destroy({ where: { id: req.params.comment_id } })
-    .then(() => res.status(200).json({ message: 'Message supprimé !' }))
-    .catch(error => res.status(500).json({ error }));
+    models.comments.findByPk(req.params.comment_id)
+    .then(comment => {
+        // Vérification que l'utilisateur qui veut supprimer le commentaire est bien son auteur ou un modérateur.
+        if (req.params.user_id === comment.user_id || req.params.is_admin) {
+            models.comments.destroy({ where: { id: req.params.comment_id } })
+            .then(() => res.status(200).json({ message: 'Commentaire supprimé !' }))
+            .catch(error => res.status(500).json({ error }));
+        }
+    })
+    .catch(error => res.status(404).json({ error }));
 };
 
 exports.getCommentReactions = (req, res, next) => {

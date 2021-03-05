@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import createPersistedState from 'vuex-persistedstate';
 
 Vue.use(Vuex)
 
@@ -9,7 +10,8 @@ export default new Vuex.Store({
             id: 0,            
             username: null,
             avatarUrl: null,
-            isAdmin: false
+            isAdmin: false,
+            token: ''
         },
         popup: false,
         postId: null
@@ -20,10 +22,13 @@ export default new Vuex.Store({
             state.loggedUser.username = user.username;
             state.loggedUser.avatarUrl = user.avatar_url;
             state.loggedUser.isAdmin = user.isAdmin;
+            state.loggedUser.token = user.token;
         },
+
         changePopup(state) {
             state.popup = !state.popup
         },
+        
         definePost(state, post_id) {
             if (post_id) {
                state.postId = post_id; 
@@ -33,10 +38,9 @@ export default new Vuex.Store({
         }   
     },
     actions: {
-        displayPopup(context) {
+        togglePopup(context) {
             context.commit('changePopup');
         }
     },
-    modules: {
-    }
+    plugins: [createPersistedState()],
 })

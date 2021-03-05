@@ -28,8 +28,8 @@
         <div class="d-flex justify-content-between">
             <div class="d-flex">
                 <Reactions :type="type" :postId="post.id" />
-                <router-link :to="{ name: 'SinglePost', params: { post_id: post.id } }">
-                    <p class="m-0 ml-5">{{ post.comments.length }} Commentaire<span v-if="post.comments.length > 1">s</span></p>
+                <router-link class="ml-5" :to="{ name: 'SinglePost', params: { post_id: post.id } }">
+                    <p class="comments m-0">{{ post.comments.length }} Commentaire<span v-if="post.comments.length > 1">s</span></p>
                 </router-link>
             </div>                        
             <p class="m-0" v-show="post.last_update && post.last_update !== post.date_post">Modifié il y a 
@@ -64,3 +64,9 @@ export default {
     }
 }
 </script>
+
+<style lang="scss">
+.comments:hover {
+    color: darken(#2c3e50, 20%);
+}
+</style>

@@ -16,6 +16,7 @@
                             {{ comment.text }}
                         </div>
                     </div>
+                    <CommentParams :comment_id="comment.id" :post_id="comment.post_id" v-show="loggedUser.id === comment.user_id || loggedUser.isAdmin" />
                 </div>
                 <div class="row justify-content-between mt-2"> 
                     <div class="col text-left d-flex ">
@@ -38,17 +39,23 @@
 
 <script>
 import http from '@/http';
+import { mapState } from "vuex";
+import CommentParams from '@/components/CommentParams';
 import Reactions from '@/components/Reactions';
 
 export default {
     name: 'AllComments',
     components: {
+        CommentParams,
         Reactions
     },
     data() {
         return {
             comments: null
         }
+    },
+    computed: {
+        ...mapState(['loggedUser'])        
     },
     created() {
         http.get(`/posts/${this.$route.params.post_id}/comments/`)

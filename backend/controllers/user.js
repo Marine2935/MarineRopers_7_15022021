@@ -14,14 +14,17 @@ require('dotenv').config();
 let key = process.env.JWT_KEY;
 
 exports.signup = (req, res, next) => {
-    const userObject = JSON.parse(req.body.user);
+    const userObject = req.file ? 
+        ({
+            ...JSON.parse(req.body.user), 
+            avatar_url: `${req.protocol}://${req.get('host')}/files/${req.file.filename}` 
+        }) : ({...req.body});
 
     // Hachage du mot de passe avant qu'il soit envoyé à la base de données.    
     bcrypt.hash(userObject.password, 10)
     .then(hash => {          
         models.users.create({
             ...userObject,
-            avatar_url: `${req.protocol}://${req.get('host')}/files/${req.file.filename}`,
             password: hash
         })
         .then(() => res.status(201).json({ message: "Nouvel utilisateur créé !" }))
@@ -64,7 +67,13 @@ exports.login = (req, res, next) => {
     .catch(error => res.status(404).json({ error }));
 };
 
-exports.getUser = (req, res, next) => {
+exports.getAllUsers = (req, res, next) => {
+    models.users.findAll()
+    .then(users => res.status(200).json(users))
+    .catch(error => res.status(400).json({ error }));
+};
+
+exports.getOneUser = (req, res, next) => {
     models.users.findByPk(req.params.user_id, {
         attributes: {
             include: [
@@ -114,28 +123,48 @@ exports.getUser = (req, res, next) => {
 };
 
 exports.modifyUser = (req, res, next) => {
-    models.users.findByPk(req.params.user_id)
-    .then(user => {
-        if (user.avatar_url) {
-           const filename = user.avatar_url.split('/files/')[1];
+    const userObject = JSON.parse(req.body.user);
 
-            fs.unlink(`files/${filename}`, (error => {
-                if (error) throw error;
-            })); 
-        }        
-    })
-    .catch(error => res.status(404).json({ error }));
+    if (userObject.id == req.params.user_id || userObject.isAdmin) {
+        models.users.findByPk(req.params.user_id)
+        .then(user => {
+            if (user.avatar_url) {
+            const filename = user.avatar_url.split('/files/')[1];
 
-    models.users.update(
-        { avatar_url: `${req.protocol}://${req.get('host')}/files/${req.file.filename}` },
-        { where: { id: req.params.user_id }}
-    )
-    .then(() => res.status(200).json({ message: "Profil utilisateur modifié !" }))
-    .catch(error => res.status(400).json({ error }));
+                fs.unlink(`files/${filename}`, (error => {
+                    if (error) throw error;
+                })); 
+            }        
+        })
+        .catch(error => res.status(404).json({ error }));
+
+        models.users.update(
+            { avatar_url: `${req.protocol}://${req.get('host')}/files/${req.file.filename}` },
+            { where: { id: req.params.user_id }}
+        )
+        .then(() => res.status(200).json({ message: "Profil utilisateur modifié !" }))
+        .catch(error => res.status(400).json({ error }));
+    }
 };
 
 exports.deleteAccount = (req, res, next) => {
+    if (req.params.is_admin) {
+         models.users.findByPk(req.params.user_id)
+        .then(user => {
+            if (user.avatar_url) {
+                const filename = user.avatar_url.split('/files/')[1];
 
+                fs.unlink(`files/${filename}`, (error => {
+                    if (error) throw error;
+                }))
+            }
+        })
+        .catch(error => res.status(404).json({ error }));
+
+        models.users.destroy({ where: { id: req.params.user_id } })
+        .then(() => res.status(200).json({ message: 'Utilisateur supprimé !'}))
+        .catch(error => res.status(500).json({ error }));
+    }
 };
 
 exports.getUserPosts = (req, res, next) => {

@@ -75,6 +75,7 @@ export default {
         updateProfil() {
             const formData = new FormData();
             formData.append('file', this.file, this.file.name);
+            formData.append('user', JSON.stringify(this.loggedUser));
 
             http.put(`/users/${this.loggedUser.id}`, formData)
             .then(() => {
