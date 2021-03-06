@@ -1,14 +1,14 @@
 <template>
     <div class="d-flex" v-if="reactions">
         <p class="m-0">
-            <span>{{ reactions[0].like }}</span>
+            <a href="#" :title="`${usersLiked}`">{{ reactions[0].like }}</a>
             <button class="border-0 btn-like button_bg" @click="react(true)">
                 <b-icon icon="arrow-up-circle-fill" variant="success" font-scale="1.5" v-if="loggedUserLiked"></b-icon>
                 <b-icon icon="arrow-up-circle" font-scale="1.5" v-else></b-icon>                
             </button>
         </p>
         <p class="m-0 ml-2">
-            <span>{{ reactions[0].dislike }}</span>
+            <a href="#" :title="`${usersDisliked}`">{{ reactions[0].dislike }}</a>
             <button class="border-0 btn-dislike button_bg" @click="react(false)">
                 <b-icon icon="arrow-down-circle-fill" variant="danger" font-scale="1.5" v-if="loggedUserDisliked"></b-icon>
                 <b-icon icon="arrow-down-circle" font-scale="1.5" v-else></b-icon>                
@@ -27,7 +27,9 @@ export default {
         return {
             reactions: null,
             loggedUserLiked: false,
-            loggedUserDisliked: false
+            loggedUserDisliked: false,
+            usersLiked: [],
+            usersDisliked: []
         }
     },
     props: {
@@ -48,11 +50,16 @@ export default {
                 }  
                 
                 this.reactions.forEach((reaction) => {
-                    if (reaction.user_id === this.loggedUser.id && reaction.has_liked === true) {
-                        this.loggedUserLiked = true
-                    }
-                    if (reaction.user_id === this.loggedUser.id && reaction.has_liked === false) {
-                        this.loggedUserDisliked = true
+                    if (reaction.has_liked) {
+                        this.usersLiked.push(`\n${reaction.user.username}`)
+                        if (reaction.user_id === this.loggedUser.id) {
+                            this.loggedUserLiked = true
+                        }
+                    } else {
+                        this.usersDisliked.push(`\n${reaction.user.username}`)
+                        if (reaction.user_id === this.loggedUser.id) {
+                            this.loggedUserDisliked = true
+                        }
                     }
                 })
             })
@@ -78,17 +85,34 @@ export default {
                 user_id: this.loggedUser.id
             };
 
-            http.post(this.defineUrl(), payload)
-            .then(() => {
-                if (params === true) {
-                    this.reactions[0].like++
-                }
+            if ((params === true && this.loggedUserLiked) || (params === false && this.loggedUserDisliked)) {
+                http.delete(`${this.defineUrl()}/${this.loggedUser.id}/${this.loggedUser.isAdmin}`)
+                .then(() => {
+                    if (params === true) {
+                        this.reactions[0].like--;
+                        this.loggedUserLiked = false;
+                    }
 
-                if (params === false) {
-                    this.reactions[0].dislike++
-                }
-            })
-            .catch(error => console.log(error)); 
+                    if (params === false) {
+                        this.reactions[0].dislike--;
+                        this.loggedUserDisliked = false;
+                    }
+                })
+            } else {
+                http.post(this.defineUrl(), payload)
+                .then(() => {
+                    if (params === true) {
+                        this.reactions[0].like++;
+                        this.loggedUserLiked = true;
+                    }
+
+                    if (params === false) {
+                        this.reactions[0].dislike++;
+                        this.loggedUserDisliked = true;
+                    }
+                })
+                .catch(error => console.log(error)); 
+            }
         }
     }
 }

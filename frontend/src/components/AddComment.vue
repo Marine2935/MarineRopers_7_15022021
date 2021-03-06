@@ -41,14 +41,16 @@ export default {
             };
             
             http.post(`/posts/${this.$route.params.post_id}/comments/`, payload)
-            .then(response => console.log(response))
+            .then(response => {
+                this.$emit("added", response.data)
+            })
             .catch(error => console.log(error));
         }
     }
 }
 </script>
 
-<style lang="scss">
+<style scoped lang="scss">
 .container_comment {
     max-width: 820px;
     margin: 0px auto;

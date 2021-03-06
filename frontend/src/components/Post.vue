@@ -21,7 +21,10 @@
         </div>                    
         <router-link :to="{ name: 'SinglePost', params: { post_id: post.id } }">
             <p class="my-4 text-left">{{ post.text }}</p>
-            <img :src="post.file_url" height="360" v-if="post.file_url" />
+            <img :src="post.file_url" height="360" v-if="post.file_url && (extension === 'jpg' || extension === 'jpeg' || extension === 'png' || extension === 'gif')" />
+            <video height="360" controls v-if="post.file_url && extension === 'mp4'">
+                <source :src="post.file_url">
+            </video>
             <iframe :src="post.link_url" class="border-0" width="100%" height="360" v-if="post.link_url"></iframe>
         </router-link>
         <hr>
@@ -55,12 +58,22 @@ export default {
         PostParams,
         Reactions        
     },
+    data() {
+        return {
+            extension: null
+        }
+    },
     props: {
         type: String,
         post: Object
     },
     computed: {
         ...mapState(['loggedUser'])
+    },
+    created() {
+        if (this.post.file_url) {
+            this.extension = this.post.file_url.split('.')[1];
+        }        
     }
 }
 </script>

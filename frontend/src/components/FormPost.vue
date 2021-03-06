@@ -1,8 +1,8 @@
 <template>
-    <div class="mt-5">               
+    <div>               
         <div class="popup justify-content-center align-items-center" v-if="popup">
             <div class="popup__container p-4 shadow">
-                <button class="btn_close p-2" @click="togglePopup(); definePost()">
+                <button class="btn_close p-2" aria-label="Fermer popup" @click="togglePopup(); definePost()">
                     <b-icon icon="x-circle" font-scale="1.5"></b-icon>
                 </button>
                 <h3><span v-if="postId">Modifier ce post</span><span v-else>Créer un nouveau post</span></h3><hr>
@@ -19,24 +19,29 @@
                     </div>
                     <div>
                         <div class="d-flex justify-content-between align-items-center">
-                            <p class="m-0 mb-2">Ajouter à votre post :</p>
-                            <div>
-                                <a class="mr-3" @click="addFile = !addFile; addLink = false"><b-icon icon="images" variant="success" font-scale="1.5"></b-icon></a>
-                                <a @click="addLink = !addLink; addFile = false"><b-icon icon="youtube" variant="danger" font-scale="1.5"></b-icon></a>
+                            <p class="m-0">Ajouter à votre post :</p>
+                            <div class="d-flex">
+                                <div class="form-group mb-0 mr-4">
+                                    <label class="custom_label m-0" for="file" aria-label="Ajouter une image ou une vidéo" @click="addLink = false"><b-icon icon="images" variant="success" font-scale="1.5"></b-icon></label>
+                                    <input class="custom_input" type="file" name="file" id="file" accept="image/jpg, image/jpeg, image/png, image/gif, video/mp4" @change="onFileUpload">
+                                </div>
+                                <a @click="addLink = !addLink"><b-icon icon="youtube" variant="danger" font-scale="1.5"></b-icon></a>
                                 <!--<a @click="addLink = !addLink; addFile = false"><b-icon icon="link" variant="info" font-scale="1.5"></b-icon></a>-->
                             </div>
-                        </div>
-                        <div class="form-group" v-if="addFile">    
-                            <label for="file">Image / Vidéo</label><br>
-                            <div class="mt-1 mb-3" v-if="filePreview">
-                                <img :src="filePreview" height="100" v-if="file.type === 'image/jpg' || file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/gif'" />
-                                <iframe :src="filePreview" v-else></iframe>    
-                            </div>        
-                            <input type="file" name="file" id="file" accept="image/png, image/gif, image/jpeg, image/jpg video/mp4, video/quicktime, application/pdf" @change="onFileUpload">
-                        </div>
+                        </div>                            
+                        <div class="mt-1 mb-3" v-if="filePreview && !addLink">
+                            <p>Image / Vidéo</p>
+                            <div class="d-flex justify-content-center align-items-end">
+                                <video class="ml-4" height="100" controls v-if="file.type === 'video/mp4' || extension === 'mp4'">
+                                    <source :src="filePreview">
+                                </video>
+                                <img class="ml-4" :src="filePreview" height="100" v-else />  
+                                <b-icon class="ml-2" icon="trash-fill" font-scale="1.2" @click="removeFile"></b-icon>
+                            </div> 
+                        </div>      
                         <div class="form-group" v-if="addLink">    
-                            <label for="url">Ajouter un lien Youtube</label><br>                                   
-                            <textarea class="form-control border-light textinput" name="url" id="url" rows="1" placeholder="Url" @change="getUrl"></textarea>
+                            <label for="url">Lien Youtube</label><br>                                   
+                            <textarea class="form-control border-light textinput" name="url" id="url" rows="1" placeholder="Url" v-model="link" @change="getUrl"></textarea>
                             <div class="mt-2" v-if="link">
                                 <iframe :src="link"></iframe>    
                             </div>               
@@ -59,32 +64,44 @@ export default {
     name: 'FormPost',
     data() {
         return {
-            text: '',
+            text: null,
             file: null,
             link: null,
-            filePreview: '',
-            addFile: false,
+            filePreview: null,
             addLink: false,
-            post: null
+            post: null,
+            extension: null
         }
     },
-    beforeMount() {
-        if (this.postId) {
+    updated() {
+        if (this.postId && this.text == null && this.popup) {
             http.get(`/posts/${this.postId}`)
             .then(response => {
-                let post = response.data;
+                let post = response.data;             
 
                 this.text = post.text;
-                if (post.file_url) {
-                    this.file = post.file_url
-                    this.addFile = true
+
+                if (post.file_url) {                    
+                    this.file = post.file_url;
+                    this.extension = this.file.split('.')[1];           
+                    this.addFile = true;
+                    this.filePreview = post.file_url ;
                 }
                 if (post.link_url) {
-                    this.link = post.link_url
-                    this.addLink = true
+                    this.link = post.link_url;
+                    this.addLink = true;
                 }
             })
             .catch(error => console.log(error));
+        } else if (!this.popup) {
+            this.text = null,
+            this.file = null,
+            this.link = null,
+            this.filePreview = null,
+            this.addFile = false,
+            this.addLink = false,
+            this.post = null,
+            this.extension = null
         }
     },
     computed: {
@@ -112,7 +129,13 @@ export default {
 
         onFileUpload(event) {
             this.file = event.target.files[0];
-            this.createImage(this.file);
+            
+            if (this.file.type === 'video/mp4') {                
+                this.filePreview = URL.createObjectURL(this.file)
+                console.log(this.filePreview)
+            } else {
+                this.createImage(this.file);
+            }
         },
 
         createImage(file) {
@@ -120,15 +143,22 @@ export default {
 
             reader.onload = () => {
                 this.filePreview = reader.result;
+                console.log(reader.result)
             };
             reader.readAsDataURL(file);
+        },
+
+        removeFile() {
+            this.file = null;
+            this.filePreview = null;
         },
 
         send() {
             const post = {
                 text: this.text,
+                file_url: null,
                 link_url: this.link,
-                loggedUser: this.loggedUser
+                user: this.loggedUser
             };
 
             const formData = new FormData();
@@ -143,15 +173,15 @@ export default {
             if (this.postId) {
                 http.put(`/posts/${this.postId}`, payload)
                 .then(response => {
-                    this.$emit("added", response.data.post)
-                    this.togglePopup
+                    this.$emit("added", response.data)
+                    this.togglePopup()
                 })
                 .catch(error => console.log(error));
             } else {
                 http.post('/posts/', payload)
                 .then(response => {
-                    this.$emit("added", response.data.post)
-                    this.togglePopup
+                    this.$emit("added", response.data)
+                    this.togglePopup()
                 })
                 .catch(error => console.log(error));
             }           
@@ -196,5 +226,13 @@ export default {
     width: 100%;
     outline: none;
     resize: none;
+}
+
+.custom_input {
+    display: none;
+}
+
+.custom_label {
+    cursor: pointer;
 }
 </style>

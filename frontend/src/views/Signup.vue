@@ -24,15 +24,14 @@
             <small id="passwordHelp" class="form-text text-muted">Doit contenir au moins 8 caractères dont une minuscule, une majuscule, un chiffre et un caractère spécial.</small>
         </div>
         <div class="form-group my-3">
-            <label for="avatar">Image de profil</label><br>  
-            <div class="d-flex justify-content-around align-items-center">                        
-                <div class="mt-2 mb-3" v-if="imagePreview">
-                    <b-avatar :src="imagePreview" size="6rem"></b-avatar>    
-                </div> 
-                <input type="file" name="avatar" id="avatar" accept="image/png, image/jpg, image/jpeg " @change="onFileUpload">  
-            </div> 
+            <p>Image de profil</p>
+            <div class="d-flex justify-content-center mt-2 mb-3">
+                <b-avatar class="ml-3" :src="imagePreview" size="5rem"></b-avatar>
+                <label class="align-self-end m-0 custom_label" for="avatar" aria-label="Modification de l'avatar"><b-icon icon="pencil-square"></b-icon></label> 
+                <input class="custom_input" type="file" name="avatar" id="avatar" accept="image/png, image/jpg, image/jpeg " @change="onFileUpload">   
+            </div>
         </div>
-        <button type="submit" class="bg-dark text-white rounded-pill m-4 px-4 py-2">Inscription</button>
+        <button type="submit" class="bg-dark text-white rounded-pill m-3 px-4 py-2">Inscription</button>
     </form>
     
   </div>
@@ -109,3 +108,13 @@ export default {
     }
 }
 </script>
+
+<style lang="scss">
+.custom_input {
+    display: none;
+}
+
+.custom_label {
+    cursor: pointer;
+}
+</style>

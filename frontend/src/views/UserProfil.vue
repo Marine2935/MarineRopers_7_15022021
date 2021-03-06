@@ -1,6 +1,6 @@
 <template>
     <div class="container mt-5" v-if="user">
-        <h1 class="pb-4">Mon profil</h1>
+        <h1>Mon profil</h1>
         <section class="my-5">
             <h2>Mes informations personnelles</h2><hr>
             <div class="my-5">
@@ -9,18 +9,14 @@
                 <p>Prénom: {{ user.first_name }}</p>
                 <p>Adresse mail : {{user.email }}</p>
                 <p>Image de profil :</p>
-                <div class="d-flex justify-content-center" v-if="!imagePreview || !displayModify"> 
-                        <b-avatar class="ml-3" :src="loggedUser.avatarUrl" size="4rem"></b-avatar>
-                        <button class="border-0 text-dark button_bg align-self-end p-0" @click="displayModify = !displayModify"><b-icon icon="pencil-square"></b-icon></button>
-                </div>
-                <form class="justify-content-center my-3" v-if="displayModify" @submit.prevent="updateProfil">                    
-                    <div class="d-flex justify-content-around align-items-center ml-3" v-if="imagePreview">                        
-                        <div class="mb-3">
-                            <b-avatar :src="imagePreview" size="6rem"></b-avatar>
-                        </div> 
-                    </div> 
-                    <input type="file" name="avatar" accept="image/png, image/jpg, image/jpeg " @change="onFileUpload"><br>
-                    <button class="bg-dark text-white rounded-pill px-4 py-1 mt-3" type="submit" v-if="imagePreview">Confirmer </button>
+                <form class="my-3" @submit.prevent="updateProfil"> 
+                    <div class="d-flex justify-content-center form-group">
+                        <b-avatar class="ml-3" :src="loggedUser.avatarUrl" size="4rem" v-if="!imagePreview"></b-avatar>                    
+                        <b-avatar :src="imagePreview" size="4rem" v-if="imagePreview"></b-avatar>
+                        <label class="align-self-end ml-2 mb-0 custom_label" for="avatar" aria-label="Modification de l'avatar"><b-icon icon="pencil-square"></b-icon></label>     
+                        <input class="custom_input" type="file" name="avatar" id="avatar" accept="image/png, image/jpg, image/jpeg " @change="onFileUpload">
+                    </div>
+                    <button class="bg-dark text-white rounded-pill px-4 py-1" type="submit" v-if="imagePreview">Confirmer</button>
                 </form>
             </div>
         </section>
@@ -46,8 +42,7 @@ export default {
         return {
             user: null, 
             file: null,
-            imagePreview: '',
-            displayModify: false
+            imagePreview: ''
         }
     },
     computed: {
@@ -80,7 +75,7 @@ export default {
             http.put(`/users/${this.loggedUser.id}`, formData)
             .then(() => {
                 this.loggedUser.avatarUrl = this.imagePreview;
-                this.displayModify = false;
+                this.imagePreview = null;
             })
             .catch(error => console.log(error));
         }
@@ -89,4 +84,11 @@ export default {
 </script>
 
 <style lang="scss">
+.custom_input {
+    display: none;
+}
+
+.custom_label {
+    cursor: pointer;
+}
 </style>
