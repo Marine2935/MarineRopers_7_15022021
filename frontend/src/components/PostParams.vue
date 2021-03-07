@@ -1,7 +1,9 @@
 <template>
     <div>
-        <b-dropdown data-toggle="dropdown" block variant="link" id="dropdown-offset" offset="-110" toggle-class="text-decoration-none" no-caret v-if="post_id">
-            <template #button-content><b-icon icon="gear" font-scale="0.9"></b-icon></template>
+        <b-dropdown data-toggle="dropdown" block variant="link" id="dropdown-offset" offset="-110" toggle-class="text-decoration-none" aria-label="Menu déroulant des modifications de post" no-caret v-if="post_id">
+            <template #button-content aria-label="Bouton du menu déroulant">
+                <b-icon icon="gear" font-scale="0.9"></b-icon>
+            </template>
             <b-dropdown-item class="text-dark py-1 menu-post" @click="togglePopup(); definePost(post_id);">
                 <b-icon class="mr-2" icon="pencil-square" font-scale="0.9"></b-icon>Modifier le post
             </b-dropdown-item>
@@ -14,9 +16,7 @@
 
 <script>
 import http from '@/http';
-import { mapState } from "vuex";
-import { mapMutations } from "vuex";
-import { mapActions } from "vuex";
+import { mapActions, mapMutations, mapState } from "vuex";
 
 export default {
     name: 'PostParams',

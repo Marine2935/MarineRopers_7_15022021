@@ -14,7 +14,8 @@ export default new Vuex.Store({
             token: ''
         },
         popup: false,
-        postId: null
+        postId: null,
+        userId: null
     },
     mutations: {
         initUser(state, user) {
@@ -35,7 +36,11 @@ export default new Vuex.Store({
             } else {
                 state.postId = null;
             }
-        }   
+        },
+        
+        defineUserId(state, user_id) {
+            state.userId = user_id
+        }
     },
     actions: {
         togglePopup(context) {

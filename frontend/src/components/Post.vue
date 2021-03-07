@@ -21,7 +21,7 @@
         </div>                    
         <router-link :to="{ name: 'SinglePost', params: { post_id: post.id } }">
             <p class="my-4 text-left">{{ post.text }}</p>
-            <img :src="post.file_url" height="360" v-if="post.file_url && (extension === 'jpg' || extension === 'jpeg' || extension === 'png' || extension === 'gif')" />
+            <img :src="post.file_url" alt="Image du post" height="360" v-if="post.file_url && (extension === 'jpg' || extension === 'jpeg' || extension === 'png' || extension === 'gif')" />
             <video height="360" controls v-if="post.file_url && extension === 'mp4'">
                 <source :src="post.file_url">
             </video>

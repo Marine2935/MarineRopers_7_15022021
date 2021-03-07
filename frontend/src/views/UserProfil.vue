@@ -68,9 +68,11 @@ export default {
             reader.readAsDataURL(file);
         },
         updateProfil() {
+            const user = {loggedUser: this.loggedUser}
             const formData = new FormData();
+            
             formData.append('file', this.file, this.file.name);
-            formData.append('user', JSON.stringify(this.loggedUser));
+            formData.append('user', JSON.stringify(user));
 
             http.put(`/users/${this.loggedUser.id}`, formData)
             .then(() => {

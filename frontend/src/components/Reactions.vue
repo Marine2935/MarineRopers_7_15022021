@@ -2,14 +2,14 @@
     <div class="d-flex" v-if="reactions">
         <p class="m-0">
             <a href="#" :title="`${usersLiked}`">{{ reactions[0].like }}</a>
-            <button class="border-0 btn-like button_bg" @click="react(true)">
+            <button class="border-0 btn-like button_bg" aria-label="J'aime ce contenu" @click="react(true)">
                 <b-icon icon="arrow-up-circle-fill" variant="success" font-scale="1.5" v-if="loggedUserLiked"></b-icon>
                 <b-icon icon="arrow-up-circle" font-scale="1.5" v-else></b-icon>                
             </button>
         </p>
         <p class="m-0 ml-2">
             <a href="#" :title="`${usersDisliked}`">{{ reactions[0].dislike }}</a>
-            <button class="border-0 btn-dislike button_bg" @click="react(false)">
+            <button class="border-0 btn-dislike button_bg" aria-label="Je n'aime ce contenu" @click="react(false)">
                 <b-icon icon="arrow-down-circle-fill" variant="danger" font-scale="1.5" v-if="loggedUserDisliked"></b-icon>
                 <b-icon icon="arrow-down-circle" font-scale="1.5" v-else></b-icon>                
             </button>

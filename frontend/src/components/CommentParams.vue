@@ -1,7 +1,9 @@
 <template>
     <div>
         <b-dropdown data-toggle="dropdown" block variant="link" id="dropdown-offset" offset="-165" toggle-class="text-decoration-none" no-caret v-if="comment_id">
-            <template #button-content><b-icon icon="gear" font-scale="0.9"></b-icon></template>
+            <template #button-content aria-label="Menu déroulant des modifications de commentaire">
+                <b-icon icon="gear" font-scale="0.9"></b-icon>
+            </template>
             <b-dropdown-item class="text-dark py-1 menu-comment" @click="deleteComment">
                 <b-icon class="mr-2" icon="trash" font-scale="0.9"></b-icon>Supprimer le commentaire
             </b-dropdown-item>

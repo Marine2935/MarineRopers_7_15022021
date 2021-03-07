@@ -56,9 +56,7 @@
 
 <script>
 import http from '@/http';
-import { mapState } from "vuex";
-import { mapMutations } from "vuex";
-import { mapActions } from "vuex";
+import { mapActions, mapMutations, mapState } from "vuex";
 
 export default {
     name: 'FormPost',

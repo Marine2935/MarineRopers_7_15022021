@@ -13,7 +13,7 @@
         </div>    
         <button type="submit" class="bg-dark text-white rounded-pill m-4 px-4 py-2">Connexion</button>            
     </form>  
-    <p class="mt-4">Première visite ? <router-link to="/signup" class="font-weight-bold text-info">Créez votre compte</router-link> !</p>
+    <p class="mt-4">Première visite ? <router-link to="/signup" class="font-weight-bold signup">Créez votre compte</router-link> !</p>
   </div>
 </template>
 
@@ -54,12 +54,20 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style scoped lang="scss">
 .forgot_pass {
     color: #2c3e50;
     font-size: 0.9rem;
     &:hover {
-        color: black;
+        color: black!important;
+    }
+}
+
+.signup {
+    color: #116E8B !important;
+
+    &:hover {
+        color: lighten(#116E8B, 15%)!important;
     }
 }
 </style>

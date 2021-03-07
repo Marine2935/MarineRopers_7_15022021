@@ -21,7 +21,7 @@
         <div class="form-group my-3">
             <label for="password">Mot de passe</label><br>
             <input class="form-control rounded" type="password" name="password" id="password" aria-describedby="passwordHelp" v-model="password" required>
-            <small id="passwordHelp" class="form-text text-muted">Doit contenir au moins 8 caractères dont une minuscule, une majuscule, un chiffre et un caractère spécial.</small>
+            <small id="passwordHelp" class="form-text">Doit contenir au moins 8 caractères dont une minuscule, une majuscule, un chiffre et un caractère spécial.</small>
         </div>
         <div class="form-group my-3">
             <p>Image de profil</p>

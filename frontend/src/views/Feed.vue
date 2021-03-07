@@ -35,9 +35,7 @@ import http from '@/http';
 import FormPost from '@/components/FormPost';
 import Post from '@/components/Post';
 import UsersList from '@/components/UsersList';
-import { mapState } from "vuex";
-import { mapMutations } from "vuex";
-import { mapActions } from "vuex";
+import { mapActions, mapMutations, mapState } from "vuex";
 
 export default {
     name: 'Feed',

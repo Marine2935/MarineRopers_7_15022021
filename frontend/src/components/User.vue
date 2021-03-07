@@ -12,14 +12,19 @@
         <div class="col" v-if="type === 'admin'">
             <a :href="`mailto:${user.email}`" title="Envoyer un mail">{{ user.email }}</a>
         </div>
-        <div class="col-1" v-if="type === 'admin'">
-            <a href="javascript:;" @click="deleteUser(user.id)"><b-icon icon="person-x-fill" font-scale="1.3" variant="danger"></b-icon></a>
+        <div class="col-2 col-xl-1" v-if="type === 'admin'">
+            <a href="#" class="mr-4" aria-label="Modification d'un utilisateur" @click="togglePopup(); defineUserId(user.id)">
+                <b-icon icon="person-lines-fill" font-scale="1.3" style="color: #11798B;"></b-icon>
+            </a>
+            <a href="javascript:;" aria-label="Suppression d'un utilisateur" @click="deleteUser(user.id)">
+                <b-icon icon="person-x-fill" font-scale="1.3" variant="danger"></b-icon>
+            </a>
         </div>
     </div>
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapActions, mapMutations, mapState } from "vuex";
 
 export default {
     name: 'User',
@@ -28,8 +33,12 @@ export default {
         user: Object
     },
     computed: {
-        ...mapState(['loggedUser']),
-        
+        ...mapState(['loggedUser']),        
+    },
+    methods: {
+        ...mapActions(['togglePopup']),
+
+        ...mapMutations(['defineUserId'])
     }
 }
 </script>

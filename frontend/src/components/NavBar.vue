@@ -16,11 +16,7 @@
                 <b-dropdown-divider class="my-2"></b-dropdown-divider>
                 <b-dropdown-item class="text-dark" @click="loggOut"><b-icon class="mr-2" icon="power"></b-icon>Déconnexion</b-dropdown-item>
             </b-dropdown>
-        </div>
-        <div v-else>
-            <router-link to="/signup" class="text-white font-weight-bold">Inscription</router-link> 
-            <router-link to="/" class="text-white font-weight-bold ml-4">Connexion</router-link>
-        </div>
+        </div>        
     </div>
 </template>
 

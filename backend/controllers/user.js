@@ -123,27 +123,44 @@ exports.getOneUser = (req, res, next) => {
 };
 
 exports.modifyUser = (req, res, next) => {
-    const userObject = JSON.parse(req.body.user);
+    const userObject = req.file ? 
+        ({
+            ...JSON.parse(req.body.user),
+            avatar_url: `${req.protocol}://${req.get('host')}/files/${req.file.filename}`
+        }) : ({...req.body});
 
-    if (userObject.id == req.params.user_id || userObject.isAdmin) {
-        models.users.findByPk(req.params.user_id)
-        .then(user => {
-            if (user.avatar_url) {
-            const filename = user.avatar_url.split('/files/')[1];
+    if (userObject.loggedUser.id == req.params.user_id || userObject.loggedUser.isAdmin) {
+        if (req.file) {
+            models.users.findByPk(req.params.user_id)
+            .then(user => {
+                if (user.avatar_url) {
+                const filename = user.avatar_url.split('/files/')[1];
 
-                fs.unlink(`files/${filename}`, (error => {
-                    if (error) throw error;
-                })); 
-            }        
-        })
-        .catch(error => res.status(404).json({ error }));
-
-        models.users.update(
-            { avatar_url: `${req.protocol}://${req.get('host')}/files/${req.file.filename}` },
-            { where: { id: req.params.user_id }}
-        )
-        .then(() => res.status(200).json({ message: "Profil utilisateur modifié !" }))
-        .catch(error => res.status(400).json({ error }));
+                    fs.unlink(`files/${filename}`, (error => {
+                        if (error) throw error;
+                    })); 
+                }        
+            })
+            .catch(error => res.status(404).json({ error }));
+        }
+        if (userObject.password) {
+            bcrypt.hash(userObject.password, 10)
+            .then(hash => {          
+                models.users.update({
+                    ...userObject,
+                    password: hash
+                    },
+                    { where: { id: req.params.user_id }}
+                )
+                .then(user => res.status(200).json(user))
+                .catch(error => res.status(400).json({ error }));
+            })    
+        } else {
+            models.users.update({ ...userObject }, { where: { id: req.params.user_id }})
+            .then(() => res.status(200).json({ message: 'Profil utilisateur modifié !'}))
+            .catch(error => res.status(400).json({ error }));
+        }     
+        
     }
 };
 
