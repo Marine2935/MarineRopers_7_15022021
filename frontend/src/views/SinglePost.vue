@@ -7,9 +7,15 @@
             </div>
             <FormPost />
             <div v-for="comment in comments" :key="comment.id">
-                <Comment :comment="comment" />            
+                <Comment @deleted="deleteComment" :comment="comment" />            
             </div>
-            <AddComment @added="addComment" />
+            <div class="container mt-4 p-0">
+                <div class="row justify-content-center">
+                    <div class="col-8 bg-white rounded shadow-sm p-3">
+                        <AddComment @added="addComment" />
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -43,12 +49,27 @@ export default {
         .catch(error => console.log(error));  
         
         http.get(`/posts/${this.$route.params.post_id}/comments/`)
-        .then(response => this.comments = response.data)
+        .then(response => {
+            this.comments = response.data})
         .catch(error => console.log(error));
     },
     methods: {        
         addComment(comment) {
             this.comments.splice(0, 0, comment)
+        },
+
+        deleteComment(comment_id) {
+            let object = '';
+            
+            this.comments.forEach((comment) => {
+                if (comment.id === comment_id) {
+                    object = comment;
+                }
+            });
+
+            let index = this.comments.indexOf(object); 
+            
+            this.comments.splice(index, 1);
         }
     }
 }

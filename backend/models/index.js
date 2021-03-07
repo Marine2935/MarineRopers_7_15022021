@@ -19,11 +19,12 @@ sequelize.authenticate().then ((err) => {
 });
 
 const modelDefiners = [
-    require('./User'),
-    require('./Post'),
     require('./Comment'),
+    require('./CommentAnswer'),
+    require('./CommentReaction'),
+    require('./Post'),    
     require('./PostReactions'),
-    require('./CommentReaction')
+    require('./User')
 ];
 
 for (const modelDefiner of modelDefiners) {

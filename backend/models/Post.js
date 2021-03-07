@@ -7,7 +7,10 @@ module.exports = (sequelize) => {
             primaryKey: true,
             autoIncrement: true
         },
-        text: DataTypes.TEXT,
+        text: {
+            type: DataTypes.TEXT,
+            allowNull: false
+        },
         file_url: DataTypes.STRING,
         link_url: DataTypes.TEXT,            
         user_id: {

@@ -32,7 +32,7 @@
             <div class="d-flex">
                 <Reactions :type="type" :postId="post.id" />
                 <router-link class="ml-5" :to="{ name: 'SinglePost', params: { post_id: post.id } }">
-                    <p class="comments m-0">{{ post.comments.length }} Commentaire<span v-if="post.comments.length > 1">s</span></p>
+                    <p class="comments m-0">{{ post.comments.length + answersCount }} Commentaire<span v-if="post.comments.length > 1">s</span></p>
                 </router-link>
             </div>                        
             <p class="m-0" v-show="post.last_update && post.last_update !== post.date_post">Modifié il y a 
@@ -48,6 +48,7 @@
 </template>
 
 <script>
+import http from '@/http';
 import PostParams from '@/components/PostParams';
 import Reactions from '@/components/Reactions';
 import { mapState } from "vuex";
@@ -60,6 +61,7 @@ export default {
     },
     data() {
         return {
+            answersCount: null,
             extension: null
         }
     },
@@ -71,9 +73,13 @@ export default {
         ...mapState(['loggedUser'])
     },
     created() {
+        http.get(`/posts/${this.post.id}/answers`)
+        .then(response => this.answersCount = response.data)
+        .catch(error => console.log(error));
+
         if (this.post.file_url) {
             this.extension = this.post.file_url.split('.')[1];
-        }        
+        }      
     }
 }
 </script>

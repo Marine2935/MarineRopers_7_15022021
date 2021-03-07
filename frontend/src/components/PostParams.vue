@@ -34,8 +34,11 @@ export default {
         deletePost() {
             http.delete(`/posts/${this.post_id}/${this.loggedUser.id}/${this.loggedUser.isAdmin}`)
             .then(() => {
-                if (this.$router.currentRoute.path !== '/feed')
-                this.$router.push('/feed')
+                if (this.$router.currentRoute.path == `/post/${this.post_id}`) {
+                    this.$router.push('/feed')
+                } else {
+                    this.$parent.$emit('deleted', this.post_id) 
+                }
             })
             .catch(error => console.log(error));
         }

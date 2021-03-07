@@ -47,21 +47,23 @@ export default {
 
                 if (!this.reactions[0]) {
                     this.reactions = [{like: 0, dislike: 0}] 
-                }  
-                
-                this.reactions.forEach((reaction) => {
-                    if (reaction.has_liked) {
-                        this.usersLiked.push(`\n${reaction.user.username}`)
-                        if (reaction.user_id === this.loggedUser.id) {
-                            this.loggedUserLiked = true
+                } else {
+                    this.reactions.forEach((reaction) => {
+                        if (reaction.has_liked) {
+                            this.usersLiked.push(`\n${reaction.user.username}`)
+
+                            if (reaction.user_id === this.loggedUser.id) {
+                                this.loggedUserLiked = true
+                            }
+                        } else {
+                            this.usersDisliked.push(`\n${reaction.user.username}`)
+                            
+                            if (reaction.user_id === this.loggedUser.id) {
+                                this.loggedUserDisliked = true
+                            }
                         }
-                    } else {
-                        this.usersDisliked.push(`\n${reaction.user.username}`)
-                        if (reaction.user_id === this.loggedUser.id) {
-                            this.loggedUserDisliked = true
-                        }
-                    }
-                })
+                    })
+                }
             })
             .catch(error => console.log(error));            
     },
@@ -79,6 +81,7 @@ export default {
                 return `/posts/${this.$route.params.post_id}/comments/${this.commentId}/reactions`            
             }
         },
+
         react(params) {
             let payload = {
                 has_liked: params,

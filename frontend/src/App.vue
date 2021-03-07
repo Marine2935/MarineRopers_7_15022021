@@ -1,12 +1,12 @@
 <template>
     <div id="app">
-        <header class="header">
+        <header class="header testnav">
             <nav id="nav" class="d-flex justify-content-between align-items-center p-4">
                 <router-link to="/feed"><img src="./assets/icon-white.svg" alt="Logo Groupomania" class="logo_header" /></router-link>
                 <NavBar />
             </nav>
         </header>
-        <router-view/>
+        <router-view class="view" />
     </div>
 </template>
 
@@ -59,7 +59,16 @@ a {
 }
 
 .header {
-    background-color: #303030;
+    background-color: #303030;  
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1;
+}
+
+.view {
+    padding-top: 100px;
 }
 
 .logo_header {

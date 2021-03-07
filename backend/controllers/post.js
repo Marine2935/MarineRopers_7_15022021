@@ -4,14 +4,15 @@ const fs = require('fs');
 
 models.posts.belongsTo(models.users, { foreignKey: 'user_id' });
 models.posts.hasMany(models.comments, { foreignKey: 'post_id' });
+models.posts.hasMany(models.comment_answers, { foreignKey: 'post_id' });
 models.post_reactions.belongsTo(models.posts, { foreignKey: 'post_id' });
 models.post_reactions.belongsTo(models.users, { foreignKey: 'user_id' });
 
 exports.getAllPosts= (req, res, next) => {
     models.posts.findAll({ 
-        include: [{ model: models.users, required: true }, { model: models.comments }], 
+        include: [{ model: models.users, required: true }, { model: models.comments }, { model: models.comment_answers }], 
         attributes: { 
-            include: [
+            include: [ 
                 [ sequelize.fn('TIMESTAMPDIFF', sequelize.literal('SECOND'), sequelize.col('date_post'), sequelize.literal('CURRENT_TIMESTAMP')), 'date_post_sec' ],
                 [ sequelize.fn('TIMESTAMPDIFF', sequelize.literal('MINUTE'), sequelize.col('date_post'), sequelize.literal('CURRENT_TIMESTAMP')), 'date_post_min' ],
                 [ sequelize.fn('TIMESTAMPDIFF', sequelize.literal('HOUR'), sequelize.col('date_post'), sequelize.literal('CURRENT_TIMESTAMP')), 'date_post_hour' ],
@@ -35,7 +36,7 @@ exports.getAllPosts= (req, res, next) => {
 
 exports.getOnePost = (req, res, next) => {
     models.posts.findByPk(req.params.post_id, { 
-        include: [{ model: models.users, required: true }, { model: models.comments }],
+        include: [{ model: models.users, required: true }, { model: models.comments }, { model: models.comment_answers }],
         attributes: { 
             include: [
                 [ sequelize.fn('TIMESTAMPDIFF', sequelize.literal('SECOND'), sequelize.col('date_post'), sequelize.literal('CURRENT_TIMESTAMP')), 'date_post_sec' ],
@@ -159,6 +160,14 @@ exports.deletePost = (req, res, next) => {
     })
     .catch(error => res.status(404).json({ error }))
     
+};
+
+exports.getAllPostCommentsAnswers = (req, res, next) => {
+    models.comment_answers.count({ 
+        where: { post_id: req.params.post_id } 
+    })
+    .then(count => res.status(200).json(count))
+    .catch(error => console.log(error));
 };
 
 exports.getPostReactions = (req, res, next) => {

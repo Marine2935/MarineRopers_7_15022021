@@ -3,6 +3,7 @@ const sequelize = require('../models/index');
 
 models.comments.belongsTo(models.users, { foreignKey: 'user_id' });
 models.comments.belongsTo(models.posts, { foreignKey: 'post_id' });
+models.comment_answers.belongsTo(models.users, { foreignKey: 'user_id' });
 models.comment_reactions.belongsTo(models.comments, { foreignKey: 'comment_id' });
 models.comment_reactions.belongsTo(models.users, { foreignKey: 'user_id' });
 
@@ -77,6 +78,67 @@ exports.deleteComment = (req, res, next) => {
     .catch(error => res.status(404).json({ error }));
 };
 
+exports.getAllCommentAnswers = (req, res, next) => {
+    models.comment_answers.findAll({ 
+        where: { comment_id: req.params.comment_id }, 
+        include: [{ model: models.users, required: true }],
+        attributes: { 
+            include: [
+                [ sequelize.fn('TIMESTAMPDIFF', sequelize.literal('SECOND'), sequelize.col('date_answer'), sequelize.literal('CURRENT_TIMESTAMP')), 'date_answer_sec' ],
+                [ sequelize.fn('TIMESTAMPDIFF', sequelize.literal('MINUTE'), sequelize.col('date_answer'), sequelize.literal('CURRENT_TIMESTAMP')), 'date_answer_min' ],
+                [ sequelize.fn('TIMESTAMPDIFF', sequelize.literal('HOUR'), sequelize.col('date_answer'), sequelize.literal('CURRENT_TIMESTAMP')), 'date_answer_hour' ],
+                [ sequelize.fn('TIMESTAMPDIFF', sequelize.literal('DAY'), sequelize.col('date_answer'), sequelize.literal('CURRENT_TIMESTAMP')), 'date_answer_day' ],
+                [ sequelize.fn('TIMESTAMPDIFF', sequelize.literal('MONTH'), sequelize.col('date_answer'), sequelize.literal('CURRENT_TIMESTAMP')), 'date_answer_month' ],
+                [ sequelize.fn('TIMESTAMPDIFF', sequelize.literal('YEAR'), sequelize.col('date_answer'), sequelize.literal('CURRENT_TIMESTAMP')), 'date_answer_year' ]               
+            ]
+        },
+        order: sequelize.literal('date_answer DESC') 
+    })
+    .then(answers => res.status(200).json(answers))
+    .catch(error => res.status(400).json({ error }));
+};
+
+exports.createCommentAnswer = (req, res, next) => {
+    const answer = { 
+        ...req.body,
+        post_id: req.params.post_id,
+        comment_id: req.params.comment_id    
+    }
+    
+    models.comment_answers.create(answer)
+    .then(answer => {
+        models.comment_anwers.findByPk(answer.id, {             
+            include: [{ model: models.users, required: true }],
+            attributes: { 
+                include: [                    
+                    [ sequelize.fn('TIMESTAMPDIFF', sequelize.literal('SECOND'), sequelize.col('date_answer'), sequelize.literal('CURRENT_TIMESTAMP')), 'date_answer_sec' ],
+                    [ sequelize.fn('TIMESTAMPDIFF', sequelize.literal('MINUTE'), sequelize.col('date_answer'), sequelize.literal('CURRENT_TIMESTAMP')), 'date_answer_min' ],
+                    [ sequelize.fn('TIMESTAMPDIFF', sequelize.literal('HOUR'), sequelize.col('date_answer'), sequelize.literal('CURRENT_TIMESTAMP')), 'date_answer_hour' ],
+                    [ sequelize.fn('TIMESTAMPDIFF', sequelize.literal('DAY'), sequelize.col('date_answer'), sequelize.literal('CURRENT_TIMESTAMP')), 'date_answer_day' ],
+                    [ sequelize.fn('TIMESTAMPDIFF', sequelize.literal('MONTH'), sequelize.col('date_answer'), sequelize.literal('CURRENT_TIMESTAMP')), 'date_answer_month' ],
+                    [ sequelize.fn('TIMESTAMPDIFF', sequelize.literal('YEAR'), sequelize.col('date_answer'), sequelize.literal('CURRENT_TIMESTAMP')), 'date_answer_year' ]               
+                ]
+            },
+            order: sequelize.literal('date_answer DESC')
+        })
+        .then(answer => res.status(200).json(answer))
+        .catch(error => res.status(404).json({ error }));
+    })
+    .catch(error => res.status(400).json({ error }));
+};
+
+exports.deleteCommentAnswer = (req, res, next) => {
+    models.comment_answers.findByPk(req.params.answer_id)
+    .then(answer => {
+        if (req.params.user_id === answer.user_id || req.params.is_admin) {
+            models.comment_answers.destroy({ where: { id: req.params.answer_id } })
+            .then(() => res.status(200).json({ message: 'Réponse supprimée !'}))
+            .catch(error => res.status(500).json({ error }));
+        }
+    })
+    .catch(error => res.status(404).json({ error }));
+};
+
 exports.getCommentReactions = (req, res, next) => {
     models.comment_reactions.findAll({ 
         include: [{ model: models.users, required: true }],
@@ -122,7 +184,7 @@ exports.cancelCommentReaction = (req, res, next) => {
     .then(comment => {
         if (req.params.user_id === comment.user_id || req.params.is_admin) {
             models.comment_reactions.destroy({ where: { comment_id: req.params.comment_id, user_id: req.params.user_id } })
-            .then()
+            .then(() => res.status(200).json({ message: 'Réaction retirée !' }))
             .catch(error => res.status(500).json({ error }));
         }
     })

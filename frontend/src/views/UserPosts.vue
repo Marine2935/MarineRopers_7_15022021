@@ -8,9 +8,9 @@
             </h1>
             <div class="mt-4">
                 <div class="row justify-content-center" v-for="post in posts" :key="post.id">
-                    <Post :post="post" :type="'all_posts'" />
+                    <Post @deleted="deletePost" :post="post" :type="'all_posts'" />
                 </div>  
-                <div v-if="!posts">
+                <div v-if="posts && posts.length === 0">
                     <p>Aucun post !</p>
                 </div>
             </div>
@@ -45,6 +45,21 @@ export default {
         http.get(`/users/${this.$route.params.user_id}/posts`)
         .then(response => this.posts = response.data)
         .catch(error => console.log(error)); 
+    },
+    methods: {
+        deletePost(post_id) {
+            let object = '';
+            
+            this.posts.forEach((post) => {
+                if (post.id === post_id) {
+                    object = post;
+                }
+            });
+
+            let index = this.posts.indexOf(object); 
+            
+            this.posts.splice(index, 1);
+        }
     }
 }
 </script>

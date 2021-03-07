@@ -26,7 +26,6 @@
                                     <input class="custom_input" type="file" name="file" id="file" accept="image/jpg, image/jpeg, image/png, image/gif, video/mp4" @change="onFileUpload">
                                 </div>
                                 <a @click="addLink = !addLink"><b-icon icon="youtube" variant="danger" font-scale="1.5"></b-icon></a>
-                                <!--<a @click="addLink = !addLink; addFile = false"><b-icon icon="link" variant="info" font-scale="1.5"></b-icon></a>-->
                             </div>
                         </div>                            
                         <div class="mt-1 mb-3" v-if="filePreview && !addLink">
