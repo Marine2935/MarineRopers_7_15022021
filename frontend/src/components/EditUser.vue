@@ -5,7 +5,8 @@
                 <button class="btn_close p-2" aria-label="Fermer popup" @click="togglePopup(); defineUserId(null)">
                     <b-icon icon="x-circle" font-scale="1.5"></b-icon>
                 </button>
-                <h3>Modifier {{ username }}</h3><hr>                
+                <h3>Modifier {{ username }}</h3>
+                <hr>                
                 <form class="mx-auto m-3 mt-5 w-50" @submit.prevent="editUser">        
                     <div class="form-group my-3">    
                         <label for="lastName">Nom</label><br>        
@@ -41,6 +42,7 @@ import { mapActions, mapMutations, mapState } from "vuex";
 
 export default {
     name: 'EditUser',
+
     data() {
         return {
             last_name: '',
@@ -50,29 +52,31 @@ export default {
             password: ''
         }
     },
+
     updated() {
         if (this.popup && this.first_name === null && this.last_name === null) {
             http.get(`/users/${this.userId}`)
             .then(response => {
                 let user = response.data;             
 
-                this.last_name = user.last_name,
-                this.first_name = user.first_name,
-                this.username = user.username,
-                this.email = user.email
-
+                this.last_name = user.last_name;
+                this.first_name = user.first_name;
+                this.username = user.username;
+                this.email = user.email;
             })
             .catch(error => console.log(error));
         } else if (!this.popup) {
-            this.last_name = null,
-            this.first_name = null,
-            this.username = null,
-            this.email = null
+            this.last_name = null;
+            this.first_name = null;
+            this.username = null;
+            this.email = null;
         }
     },
+
     computed: {
         ...mapState(['loggedUser', 'popup', 'userId'])        
     },
+
     methods: {
         ...mapActions(['togglePopup']),
 
@@ -90,8 +94,8 @@ export default {
             
             http.put(`/users/${this.userId}`, user)
             .then(response => {
-                this.$emit("edited", response.data)
-                this.togglePopup()
+                this.$emit("edited", response.data);
+                this.togglePopup();
             })
             .catch(error => console.log(error));              
         }

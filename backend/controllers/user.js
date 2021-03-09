@@ -1,15 +1,13 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const { models } = require('../models');
 const sequelize = require('../models/index');
 const fs = require('fs');
 
-const { models } = require('../models');
-
-models.users.hasMany(models.posts, { foreignKey: 'user_id' });
-models.users.hasMany(models.comments, { foreignKey: 'user_id' });
 models.posts.belongsTo(models.users, { foreignKey: 'user_id' });
 models.posts.hasMany(models.comments, { foreignKey: 'post_id' });
 
+// Récupération de la variable d'environnement contenant le token d'authentification.
 require('dotenv').config();
 let key = process.env.JWT_KEY;
 
@@ -122,15 +120,17 @@ exports.getOneUser = (req, res, next) => {
     .catch(error => res.status(404).json({ error }));
 };
 
-exports.modifyUser = (req, res, next) => {
+exports.modifyAccount = (req, res, next) => {
     const userObject = req.file ? 
         ({
             ...JSON.parse(req.body.user),
             avatar_url: `${req.protocol}://${req.get('host')}/files/${req.file.filename}`
         }) : ({...req.body});
 
+    // Vérification que l'utilisateur qui veut modifier le compte est bien son propriétaire ou un modérateur.    
     if (userObject.loggedUser.id == req.params.user_id || userObject.loggedUser.isAdmin) {
         if (req.file) {
+            // Si modification de l'avatar, suppression du fichier initialement stocké dans le dossier files puis mise à jour du profil.
             models.users.findByPk(req.params.user_id)
             .then(user => {
                 if (user.avatar_url) {
@@ -143,6 +143,7 @@ exports.modifyUser = (req, res, next) => {
             })
             .catch(error => res.status(404).json({ error }));
         }
+
         if (userObject.password) {
             bcrypt.hash(userObject.password, 10)
             .then(hash => {          
@@ -165,6 +166,7 @@ exports.modifyUser = (req, res, next) => {
 };
 
 exports.deleteAccount = (req, res, next) => {
+    // Vérification que l'utilisateur qui veut supprimer le compte a bien des droits administrateur.
     if (req.params.is_admin) {
          models.users.findByPk(req.params.user_id)
         .then(user => {
@@ -175,12 +177,14 @@ exports.deleteAccount = (req, res, next) => {
                     if (error) throw error;
                 }))
             }
+
+            models.users.destroy({ where: { id: req.params.user_id } })
+            .then(() => res.status(200).json({ message: 'Utilisateur supprimé !'}))
+            .catch(error => res.status(500).json({ error }));
         })
         .catch(error => res.status(404).json({ error }));
 
-        models.users.destroy({ where: { id: req.params.user_id } })
-        .then(() => res.status(200).json({ message: 'Utilisateur supprimé !'}))
-        .catch(error => res.status(500).json({ error }));
+        
     }
 };
 

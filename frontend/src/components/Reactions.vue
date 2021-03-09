@@ -23,6 +23,7 @@ import { mapState } from "vuex";
 
 export default {
     name: 'Reactions',
+
     data() {
         return {
             reactions: null,
@@ -32,34 +33,37 @@ export default {
             usersDisliked: []
         }
     },
+
     props: {
-        type: String, 
+        commentId: Number, 
         postId: Number,
-        commentId: Number
+        type: String
     },
+
     computed: {
         ...mapState(['loggedUser'])                
     },
+
     created() {
         http.get(this.defineUrl())
             .then(response => {
-                this.reactions = response.data
+                this.reactions = response.data;
 
                 if (!this.reactions[0]) {
-                    this.reactions = [{like: 0, dislike: 0}] 
+                    this.reactions = [{like: 0, dislike: 0}]; 
                 } else {
                     this.reactions.forEach((reaction) => {
                         if (reaction.has_liked) {
-                            this.usersLiked.push(`\n${reaction.user.username}`)
+                            this.usersLiked.push(`\n${reaction.user.username}`);
 
                             if (reaction.user_id === this.loggedUser.id) {
-                                this.loggedUserLiked = true
+                                this.loggedUserLiked = true;
                             }
                         } else {
-                            this.usersDisliked.push(`\n${reaction.user.username}`)
+                            this.usersDisliked.push(`\n${reaction.user.username}`);
                             
                             if (reaction.user_id === this.loggedUser.id) {
-                                this.loggedUserDisliked = true
+                                this.loggedUserDisliked = true;
                             }
                         }
                     })
@@ -67,18 +71,19 @@ export default {
             })
             .catch(error => console.log(error));            
     },
+
     methods: {
         defineUrl() {
             if (this.type == 'all_posts') {
-                return `/posts/${this.postId}/reactions` 
+                return `/posts/${this.postId}/reactions`;
             }
 
             if (this.type == 'single_post') {
-                return `/posts/${this.$route.params.post_id}/reactions` 
+                return `/posts/${this.$route.params.post_id}/reactions`; 
             }
 
             if (this.type == 'comment') {
-                return `/posts/${this.$route.params.post_id}/comments/${this.commentId}/reactions`            
+                return `/posts/${this.$route.params.post_id}/comments/${this.commentId}/reactions`;            
             }
         },
 

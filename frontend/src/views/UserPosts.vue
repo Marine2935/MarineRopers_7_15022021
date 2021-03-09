@@ -28,24 +28,29 @@ import { mapState } from "vuex";
 
 export default {
     name: 'UserPosts',
+
     components: {
         FormPost,
         Post,
         UsersList
     },
+
     data() {
         return {
             posts: null
         }
     },
+
     computed: {
         ...mapState(['loggedUser'])
     },
-    created() {        
+
+    created() {
         http.get(`/users/${this.$route.params.user_id}/posts`)
         .then(response => this.posts = response.data)
-        .catch(error => console.log(error)); 
+        .catch(error => console.log(error));
     },
+    
     methods: {
         deletePost(post_id) {
             let object = '';
@@ -59,6 +64,18 @@ export default {
             let index = this.posts.indexOf(object); 
             
             this.posts.splice(index, 1);
+        },
+
+        getUserPosts() {
+            http.get(`/users/${this.$route.params.user_id}/posts`)
+            .then(response => this.posts = response.data)
+            .catch(error => console.log(error)); 
+        }
+    },
+
+    watch: {
+        $route() {
+            this.getUserPosts();  
         }
     }
 }

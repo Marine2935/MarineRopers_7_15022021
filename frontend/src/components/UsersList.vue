@@ -15,14 +15,17 @@ import User from '@/components/User';
 
 export default {
     name: 'UsersList',
+
     components: {
         User
     },
+
     data() {
         return {
             users: null
         }
     },
+    
     created() {
         http.get('/users/')
         .then(response => this.users = response.data)

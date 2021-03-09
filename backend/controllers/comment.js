@@ -54,17 +54,6 @@ exports.createComment = (req, res, next) => {
     .catch(error => res.status(400).json({ error }));
 };
 
-// exports.modifyComment = (req, res, next) => {
-//     const comment = { 
-//         ...req.body,
-//         post_id: req.params.post_id 
-//     };
-
-//     models.Comment.update(comment, { where: { id: req.params.id } })
-//     .then(() => res.status(200).json({ message: 'Commentaire modifié !'}))
-//     .catch(error => res.status(400).json({ error }));
-// };
-
 exports.deleteComment = (req, res, next) => {
     models.comments.findByPk(req.params.comment_id)
     .then(comment => {
@@ -103,7 +92,7 @@ exports.createCommentAnswer = (req, res, next) => {
         ...req.body,
         post_id: req.params.post_id,
         comment_id: req.params.comment_id    
-    }
+    };
     
     models.comment_answers.create(answer)
     .then(answer => {
@@ -172,7 +161,7 @@ exports.newCommentReaction = (req, res, next) => {
     const reaction = { 
         ...req.body,
         comment_id: req.params.comment_id    
-     }
+    };
 
     models.comment_reactions.create(reaction)
     .then(() => res.status(201).json({ message: 'Nouvelle réaction ajoutée !'}))

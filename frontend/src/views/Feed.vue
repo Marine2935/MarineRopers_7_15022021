@@ -19,7 +19,7 @@
                 <FormPost @added="addPost" />
                 <div class="mt-4">
                     <div class="row justify-content-center" v-for="post in posts" :key="post.id">
-                        <Post @deleted="deletePost" :post="post" :type="'all_posts'" />
+                        <Post :post="post" :type="'all_posts'" @deleted="deletePost" />
                     </div>  
                     <div v-if="!posts">
                         <p>Aucun post !</p>
@@ -44,27 +44,32 @@ export default {
         Post,
         UsersList
     },
+
     data() {
         return {
             posts: null
         }
     },
+
     computed: {
-        ...mapState(['loggedUser']),
-        
+        ...mapState(['loggedUser'])        
     },
+
     created() {
         http.get('/posts/')
         .then(response => this.posts = response.data)
         .catch(error => console.log(error));
     },
-    methods: {
-        ...mapMutations(['definePost']),
 
+    methods: {
         ...mapActions(['togglePopup']),
 
+        ...mapMutations(['definePost']),        
+
         addPost(post) {
-            this.posts.splice(0, 0, post)
+            console.log('a', post)
+            this.posts.splice(0, 0, post);
+            
         },
 
         deletePost(post_id) {

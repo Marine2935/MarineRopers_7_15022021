@@ -18,37 +18,26 @@ import { mapState } from "vuex";
 
 export default {
     name: 'Users',
+    
     components: {
         EditUser,
         User
     },
+
     data() {
         return {
             users: null
         }
     },
+
     computed: {
         ...mapState(['loggedUser'])        
     },
+
     created() {
         http.get('/users/')
         .then(response => this.users = response.data)
         .catch(error => console.log(error));
-    },
-    methods: {
-        editUser(user_id) {
-            console.log(user_id)
-        },
-
-        deleteUser(user_id) {
-            if (confirm("Cette action supprimera définitivement l'utilisateur.\nÊtes-vous sûr(e) de vouloir continuer ?")) {
-                http.delete(`/users/${user_id}/${this.loggedUser.isAdmin}`)
-                .then(() => {
-                    window.location.reload();
-                })
-                .catch(error => console.log(error));
-            }
-        }
     }
 }
 </script>

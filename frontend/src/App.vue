@@ -18,31 +18,34 @@ export default {
     components: {
         NavBar
     },
+
     mounted() {
         this.check()
     },
+
+    computed: {
+        ...mapState(['loggedUser'])
+    },
+
     methods: {
         check() {            
             if (this.loggedUser.id == 0) {
-                if (sessionStorage.getItem('token')) {
-                    sessionStorage.removeItem('token')
+                if (localStorage.getItem('vuex')) {
+                    localStorage.removeItem('vuex');
                 }
+
                 if (this.$router.currentRoute.path !== '/' || this.$router.currentRoute.path !== '/signup') {
-                    this.$router.push('/')
-                }
-                
+                    this.$router.push('/');
+                }                
             }
         }
-    },
-    computed: {
-        ...mapState(['loggedUser'])
-    }
+    }    
 }
 </script>
 
 <style lang="scss">
 #app {
-    font-family: Avenir, Helvetica, Arial, sans-serif;
+    font-family: Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-align: center;

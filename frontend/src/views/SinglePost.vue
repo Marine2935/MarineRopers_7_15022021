@@ -7,7 +7,7 @@
             </div>
             <FormPost />
             <div v-for="comment in comments" :key="comment.id">
-                <Comment @deleted="deleteComment" :comment="comment" />            
+                <Comment :comment="comment" @deleted="deleteComment" />            
             </div>
             <div class="container mt-4 p-0">
                 <div class="row justify-content-center">
@@ -30,6 +30,7 @@ import UsersList from '@/components/UsersList';
 
 export default {
     name: 'SinglePost',
+
     components: {
         AddComment,
         Comment,
@@ -37,12 +38,14 @@ export default {
         Post,
         UsersList
     },
+
     data() {
         return {
-            post: null,
-            comments: null
+            comments: null,
+            post: null            
         }
     },
+
     created() {
         http.get(`/posts/${this.$route.params.post_id}`)
         .then(response=> this.post = response.data)
@@ -53,7 +56,8 @@ export default {
             this.comments = response.data})
         .catch(error => console.log(error));
     },
-    methods: {        
+    
+    methods: {   
         addComment(comment) {
             this.comments.splice(0, 0, comment)
         },

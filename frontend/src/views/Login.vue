@@ -1,20 +1,21 @@
 <template>
-  <div class="login container my-5">
-    <h1>Connexion</h1>
-    <form class="mx-auto mt-5 mb-3 w-50" @submit.prevent="login">
-        <div class="form-group my-3">    
-            <label for="username">Nom d'utilisateur</label><br>        
-            <input class="form-control rounded" type="text" name="username" id="username" v-model="username" required>
-        </div>
-        <div class="form-group my-3">
-            <label for="password">Mot de passe</label><br>
-            <input class="form-control rounded" type="password" name="password" id="password" v-model="password" required>
-            <p class="text-right pt-2 pr-2"><a class="forgot_pass" @click="alert">Mot de passe oublié ?</a></p>
-        </div>    
-        <button type="submit" class="bg-dark text-white rounded-pill m-4 px-4 py-2">Connexion</button>            
-    </form>  
-    <p class="mt-4">Première visite ? <router-link to="/signup" class="font-weight-bold signup">Créez votre compte</router-link> !</p>
-  </div>
+    <div class="login container my-5">
+        <h1>Connexion</h1>
+        <form class="mx-auto mt-5 mb-3 w-50" @submit.prevent="login">
+            <div class="form-group my-3">    
+                <label for="username">Nom d'utilisateur</label><br>        
+                <b-form-input class="form-control rounded" type="text" name="username" ref="username" id="username" v-model="username" required></b-form-input>
+            </div>
+            <div class="form-group my-3">
+                <label for="password">Mot de passe</label><br>
+                <b-form-input class="form-control rounded" type="password" name="password" ref="password" id="password" v-model="password" required></b-form-input>                
+                <p class="text-right pt-2 pr-2"><a class="forgot_pass" @click="alert">Mot de passe oublié ?</a></p>
+                <b-form-invalid-feedback id="input-live-feedback">Nom d'utilisateur ou mot de passe incorrect.</b-form-invalid-feedback>                
+            </div>    
+            <button type="submit" class="bg-dark text-white rounded-pill m-4 px-4 py-2">Connexion</button>            
+        </form>  
+        <p class="mt-4">Première visite ? <router-link to="/signup" class="font-weight-bold signup">Créez votre compte</router-link> !</p>
+    </div>
 </template>
 
 <script>
@@ -23,20 +24,27 @@ import { mapMutations } from "vuex";
 
 export default {
     name: 'Login',
+
     data() {
         return {
             username: '',
             password: ''
         }
     },
+    
     methods: {
         ...mapMutations(['initUser']),
-        
+
+        alert() {
+            return alert('Veuillez prendre contact avec la personne en charge des ressources humaines afin de réinitialiser votre mot de passe.')
+        },
+
         login() {              
             let payload = {
                 username: this.username,
                 password: this.password
             } 
+            
             http.post('/users/login', payload)
             .then(response => {
                 this.initUser(response.data)
@@ -44,12 +52,12 @@ export default {
             })
             .catch(error => {
                 localStorage.removeItem('vuex');
-                console.log(error)
+                for (let i in this.$refs) {
+                    this.$refs[i].state = false;
+                }
+                console.log(error);
             });
-        },
-        alert() {
-            return alert('Veuillez prendre contact avec la personne en charge des ressources humaines afin de réinitialiser votre mot de passe.')
-        }   
+        } 
     }
 }
 </script>

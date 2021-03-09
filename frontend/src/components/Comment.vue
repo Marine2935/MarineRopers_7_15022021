@@ -38,13 +38,13 @@
                 </a>
                 <div v-if="showAnswers">
                     <div v-for="answer in answers" :key="answer.id">
-                        <CommentAnswer :answer="answer" />
+                        <CommentAnswer :answer="answer" @deleted="deleteAnswer" />
                     </div>
                 </div>
             </div>
             <div class="row d-flex justify-content-end" v-if="displayAddAnswer">
                 <div class="col bg-white rounded shadow-sm p-3">
-                    <AddComment :type="'answer'" :commentId="comment.id" /> 
+                    <AddComment :type="'answer'" :commentId="comment.id" @added="addAnswer" /> 
                 </div>
             </div>
         </div>
@@ -61,12 +61,14 @@ import { mapState } from "vuex";
 
 export default {
     name: 'Comment',
+    
     components: { 
         AddComment, 
         CommentAnswer,      
         CommentParams,
         Reactions
     },
+
     data () {
         return {
             answers: null,
@@ -74,16 +76,39 @@ export default {
             showAnswers: false
         }
     },
+
     props: {
         comment: Object
     },
+
     computed: {
         ...mapState(['loggedUser'])        
     },
+
     created() {
         http.get(`/posts/${this.$route.params.post_id}/comments/${this.comment.id}/answers`)
         .then(response => this.answers = response.data)
         .catch(error => console.log(error));
+    },
+
+    methods: {
+        addAnswer(answer) {
+            this.answers.splice(0, 0, answer)
+        },
+
+        deleteAnswer(answer_id) {
+            let object = '';
+            
+            this.answers.forEach((answer) => {
+                if (answer.id === answer_id) {
+                    object = answer;
+                }
+            });
+
+            let index = this.answers.indexOf(object); 
+            
+            this.answers.splice(index, 1);
+        }
     }
 }
 </script>

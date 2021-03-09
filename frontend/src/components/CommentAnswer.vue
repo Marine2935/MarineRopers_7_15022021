@@ -17,10 +17,7 @@
                 </div>
                <CommentParams :type="'answer'" :answer_id="answer.id" :comment_id="answer.comment_id" v-show="loggedUser.id === answer.user_id || loggedUser.isAdmin" />
             </div>
-            <div class="row justify-content-between mt-2"> 
-                <div class="col text-left d-flex ">
-                    <!--<Reactions :type="'answer'" :answerId="answer.id"/>  -->                  
-                </div>
+            <div class="row justify-content-between mt-2">
                 <div class="col text-right">
                     <span v-if="answer.date_answer_sec < 60">{{ answer.date_answer_sec }}s</span>
                     <span v-if="answer.date_answer_min < 60 && answer.date_answer_min !== 0">{{ answer.date_answer_min }}min</span>
@@ -40,12 +37,15 @@ import { mapState } from "vuex";
 
 export default {
     name: 'CommentAnswer',
+
     components: {
         CommentParams
     },
+
     props: {
         answer: Object
     },
+    
     computed: {
         ...mapState(['loggedUser'])        
     }

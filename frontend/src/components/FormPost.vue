@@ -5,7 +5,11 @@
                 <button class="btn_close p-2" aria-label="Fermer popup" @click="togglePopup(); definePost()">
                     <b-icon icon="x-circle" font-scale="1.5"></b-icon>
                 </button>
-                <h3><span v-if="postId">Modifier ce post</span><span v-else>Créer un nouveau post</span></h3><hr>
+                <h3>
+                    <span v-if="postId">Modifier ce post</span>
+                    <span v-else>Créer un nouveau post</span>
+                </h3>
+                <hr>
                 <div class="text-left">
                     <p class="m-0">
                         <b-avatar :src="loggedUser.avatarUrl" size="3rem"></b-avatar>
@@ -22,10 +26,14 @@
                             <p class="m-0">Ajouter à votre post :</p>
                             <div class="d-flex">
                                 <div class="form-group mb-0 mr-4">
-                                    <label class="custom_label m-0" for="file" aria-label="Ajouter une image ou une vidéo" @click="addLink = false"><b-icon icon="images" variant="success" font-scale="1.5"></b-icon></label>
+                                    <label class="custom_label m-0" for="file" aria-label="Ajouter une image ou une vidéo" @click="addLink = false">
+                                        <b-icon icon="images" variant="success" font-scale="1.5"></b-icon>
+                                    </label>
                                     <input class="custom_input" type="file" name="file" id="file" accept="image/jpg, image/jpeg, image/png, image/gif, video/mp4" @change="onFileUpload">
                                 </div>
-                                <a @click="addLink = !addLink"><b-icon icon="youtube" variant="danger" font-scale="1.5"></b-icon></a>
+                                <a @click="addLink = !addLink">
+                                    <b-icon icon="youtube" variant="danger" font-scale="1.5"></b-icon>
+                                </a>
                             </div>
                         </div>                            
                         <div class="mt-1 mb-3" v-if="filePreview && !addLink">
@@ -59,6 +67,7 @@ import { mapActions, mapMutations, mapState } from "vuex";
 
 export default {
     name: 'FormPost',
+
     data() {
         return {
             text: null,
@@ -70,6 +79,7 @@ export default {
             extension: null
         }
     },
+
     updated() {
         if (this.postId && this.text == null && this.popup) {
             http.get(`/posts/${this.postId}`)
@@ -101,13 +111,24 @@ export default {
             this.extension = null
         }
     },
+
     computed: {
         ...mapState(['loggedUser', 'popup', 'postId'])        
     },
-    methods: {
-        ...mapMutations(['definePost']),
 
+    methods: {
         ...mapActions(['togglePopup']),
+
+        ...mapMutations(['definePost']), 
+        
+        createImage(file) {
+            let reader = new FileReader();
+
+            reader.onload = () => {
+                this.filePreview = reader.result;
+            };
+            reader.readAsDataURL(file);
+        },
         
         getEmbedUrl(url) {
             let ytId = url.match(/youtu\.be\/([a-zA-Z0-9_-]+)/);
@@ -128,37 +149,25 @@ export default {
             this.file = event.target.files[0];
             
             if (this.file.type === 'video/mp4') {                
-                this.filePreview = URL.createObjectURL(this.file)
-                console.log(this.filePreview)
+                this.filePreview = URL.createObjectURL(this.file);
             } else {
                 this.createImage(this.file);
             }
         },
-
-        createImage(file) {
-            let reader = new FileReader();
-
-            reader.onload = () => {
-                this.filePreview = reader.result;
-                console.log(reader.result)
-            };
-            reader.readAsDataURL(file);
-        },
-
+        
         removeFile() {
             this.file = null;
             this.filePreview = null;
         },
 
         send() {
+            const formData = new FormData();
             const post = {
                 text: this.text,
                 file_url: null,
                 link_url: this.link,
                 user: this.loggedUser
-            };
-
-            const formData = new FormData();
+            };           
             
             if (this.file) {
                 formData.append('post', JSON.stringify(post));
@@ -170,15 +179,15 @@ export default {
             if (this.postId) {
                 http.put(`/posts/${this.postId}`, payload)
                 .then(response => {
-                    this.$emit("added", response.data)
-                    this.togglePopup()
+                    this.$emit("added", response.data);
+                    this.togglePopup();
                 })
                 .catch(error => console.log(error));
             } else {
                 http.post('/posts/', payload)
                 .then(response => {
-                    this.$emit("added", response.data)
-                    this.togglePopup()
+                    this.$emit("added", response.data);
+                    this.togglePopup();
                 })
                 .catch(error => console.log(error));
             }           

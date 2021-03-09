@@ -24,21 +24,35 @@
 </template>
 
 <script>
+import http from '@/http';
 import { mapActions, mapMutations, mapState } from "vuex";
 
 export default {
     name: 'User',
+    
     props: {
         type: String,
         user: Object
     },
+
     computed: {
         ...mapState(['loggedUser']),        
     },
+
     methods: {
         ...mapActions(['togglePopup']),
 
-        ...mapMutations(['defineUserId'])
+        ...mapMutations(['defineUserId']),
+
+        deleteUser(user_id) {
+            if (confirm("Cette action supprimera définitivement l'utilisateur.\nÊtes-vous sûr(e) de vouloir continuer ?")) {
+                http.delete(`/users/${user_id}/${this.loggedUser.isAdmin}`)
+                .then(() => {
+                    window.location.reload();
+                })
+                .catch(error => console.log(error));
+            }
+        }
     }
 }
 </script>

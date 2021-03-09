@@ -11,12 +11,13 @@ export default new Vuex.Store({
             username: null,
             avatarUrl: null,
             isAdmin: false,
-            token: ''
+            token: null
         },
         popup: false,
         postId: null,
         userId: null
     },
+
     mutations: {
         initUser(state, user) {
             state.loggedUser.id = user.id;
@@ -27,7 +28,7 @@ export default new Vuex.Store({
         },
 
         changePopup(state) {
-            state.popup = !state.popup
+            state.popup = !state.popup;
         },
         
         definePost(state, post_id) {
@@ -39,13 +40,15 @@ export default new Vuex.Store({
         },
         
         defineUserId(state, user_id) {
-            state.userId = user_id
+            state.userId = user_id;
         }
     },
+
     actions: {
         togglePopup(context) {
             context.commit('changePopup');
         }
     },
-    plugins: [createPersistedState()],
+
+    plugins: [createPersistedState()]
 })

@@ -55,23 +55,28 @@ import { mapState } from "vuex";
 
 export default {
     name: 'Post',
+
     components: {
         PostParams,
         Reactions        
     },
+
     data() {
         return {
             answersCount: null,
             extension: null
         }
     },
-    props: {
-        type: String,
-        post: Object
+
+    props: {        
+        post: Object,
+        type: String
     },
+
     computed: {
         ...mapState(['loggedUser'])
     },
+
     created() {
         http.get(`/posts/${this.post.id}/answers`)
         .then(response => this.answersCount = response.data)

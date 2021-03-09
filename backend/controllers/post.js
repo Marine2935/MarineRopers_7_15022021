@@ -10,7 +10,7 @@ models.post_reactions.belongsTo(models.users, { foreignKey: 'user_id' });
 
 exports.getAllPosts= (req, res, next) => {
     models.posts.findAll({ 
-        include: [{ model: models.users, required: true }, { model: models.comments }, { model: models.comment_answers }], 
+        include: [{ model: models.users, required: true }, { model: models.comments }], 
         attributes: { 
             include: [ 
                 [ sequelize.fn('TIMESTAMPDIFF', sequelize.literal('SECOND'), sequelize.col('date_post'), sequelize.literal('CURRENT_TIMESTAMP')), 'date_post_sec' ],
@@ -36,7 +36,7 @@ exports.getAllPosts= (req, res, next) => {
 
 exports.getOnePost = (req, res, next) => {
     models.posts.findByPk(req.params.post_id, { 
-        include: [{ model: models.users, required: true }, { model: models.comments }, { model: models.comment_answers }],
+        include: [{ model: models.users, required: true }, { model: models.comments }],
         attributes: { 
             include: [
                 [ sequelize.fn('TIMESTAMPDIFF', sequelize.literal('SECOND'), sequelize.col('date_post'), sequelize.literal('CURRENT_TIMESTAMP')), 'date_post_sec' ],
@@ -68,8 +68,7 @@ exports.createPost = (req, res, next) => {
         }) : ({ 
             ...req.body,
             user_id: req.body.user.id 
-        });
-        
+        });        
         
     models.posts.create(post)
     .then(post => {
@@ -203,7 +202,7 @@ exports.newPostReaction = (req, res, next) => {
     const reaction = { 
         ...req.body,
         post_id: req.params.post_id
-     }
+    };
 
     models.post_reactions.create(reaction)
     .then(() => res.status(201).json({ message: 'Nouvelle réaction ajoutée !'}))

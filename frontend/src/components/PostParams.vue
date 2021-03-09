@@ -20,24 +20,27 @@ import { mapActions, mapMutations, mapState } from "vuex";
 
 export default {
     name: 'PostParams',
+
     props: {
         post_id: Number
     },
+
     computed: {
         ...mapState(['loggedUser'])        
     },
-    methods: {
-        ...mapMutations(['definePost']),
 
+    methods: {
         ...mapActions(['togglePopup']),
+
+        ...mapMutations(['definePost']),        
 
         deletePost() {
             http.delete(`/posts/${this.post_id}/${this.loggedUser.id}/${this.loggedUser.isAdmin}`)
             .then(() => {
                 if (this.$router.currentRoute.path == `/post/${this.post_id}`) {
-                    this.$router.push('/feed')
+                    this.$router.push('/feed');
                 } else {
-                    this.$parent.$emit('deleted', this.post_id) 
+                    this.$parent.$emit('deleted', this.post_id);
                 }
             })
             .catch(error => console.log(error));
