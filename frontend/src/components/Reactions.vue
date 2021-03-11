@@ -87,6 +87,20 @@ export default {
             }
         },
 
+        deleteUserFromArray(array, user_id) {
+            let object = '';
+            
+            array.forEach((user) => {
+                if (user.id === user_id) {
+                    object = user;
+                }
+            });
+
+            let index = array.indexOf(object);
+
+            array.splice(index, 1);
+        },
+
         react(params) {
             let payload = {
                 has_liked: params,
@@ -99,11 +113,13 @@ export default {
                     if (params === true) {
                         this.reactions[0].like--;
                         this.loggedUserLiked = false;
+                        this.deleteUserFromArray(this.usersLiked, this.loggedUser.id);                        
                     }
 
                     if (params === false) {
                         this.reactions[0].dislike--;
                         this.loggedUserDisliked = false;
+                        this.deleteUserFromArray(this.usersDisliked, this.loggedUser.id); 
                     }
                 })
             } else {
@@ -112,11 +128,13 @@ export default {
                     if (params === true) {
                         this.reactions[0].like++;
                         this.loggedUserLiked = true;
+                        this.usersLiked.push(`\n${this.loggedUser.username}`);
                     }
 
                     if (params === false) {
                         this.reactions[0].dislike++;
                         this.loggedUserDisliked = true;
+                        this.usersDisliked.push(`\n${this.loggedUser.username}`);
                     }
                 })
                 .catch(error => console.log(error)); 

@@ -1,6 +1,6 @@
 <template>
     <div class="login container my-5">
-        <h1>Connexion</h1>
+        <h2>Connexion</h2>
         <form class="mx-auto mt-5 mb-3 w-50" @submit.prevent="login">
             <div class="form-group my-3">    
                 <label for="username">Nom d'utilisateur</label><br>        

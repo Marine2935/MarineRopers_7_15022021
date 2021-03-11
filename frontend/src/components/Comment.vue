@@ -1,9 +1,9 @@
 <template>
     <div class="row justify-content-center">
-        <div class="col-1 my-3 pt-1">
+        <div class="col-2 col-lg-1 my-3 pt-1">
             <b-avatar :src="comment.user.avatar_url"></b-avatar>              
         </div>
-        <div class="test col-7 my-2">
+        <div class="test col-10 col-lg-7 my-2">
             <div class="row bg-white rounded shadow-sm p-3">
                 <div class="col pl-1">
                     <div class="text-left align-items-center">                    
@@ -15,7 +15,7 @@
                         {{ comment.text }}
                     </div>
                 </div>
-                <CommentParams :type="'comment'" :comment_id="comment.id" :post_id="comment.post_id" v-show="loggedUser.id === comment.user_id || loggedUser.isAdmin" />
+                <CommentParams :type="'comment'" :answers="answers" :comment_id="comment.id" :post_id="comment.post_id" v-show="loggedUser.id === comment.user_id || loggedUser.isAdmin" />
             </div>
             <div class="row justify-content-between mt-2"> 
                 <div class="col text-left d-flex ">
@@ -93,7 +93,9 @@ export default {
 
     methods: {
         addAnswer(answer) {
-            this.answers.splice(0, 0, answer)
+            this.answers.splice(0, 0, answer);
+            this.$emit('answer', 'add');
+            this.displayAddAnswer = !this.displayAddAnswer;
         },
 
         deleteAnswer(answer_id) {
@@ -108,6 +110,7 @@ export default {
             let index = this.answers.indexOf(object); 
             
             this.answers.splice(index, 1);
+            this.$emit('answer', 'del')
         }
     }
 }

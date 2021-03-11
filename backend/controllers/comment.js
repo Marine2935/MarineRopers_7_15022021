@@ -1,5 +1,6 @@
 const { models } = require('../models');
 const sequelize = require('../models/index');
+const sanitizeHtml = require('sanitize-html');
 
 models.comments.belongsTo(models.users, { foreignKey: 'user_id' });
 models.comments.belongsTo(models.posts, { foreignKey: 'post_id' });
@@ -31,6 +32,10 @@ exports.createComment = (req, res, next) => {
     const comment = { 
         ...req.body,
         post_id: req.params.post_id
+    };
+
+    for (let i in comment) {        
+        comment[i] = sanitizeHtml(comment[i]);
     };
     
     models.comments.create(comment)
@@ -93,10 +98,14 @@ exports.createCommentAnswer = (req, res, next) => {
         post_id: req.params.post_id,
         comment_id: req.params.comment_id    
     };
+
+    for (let i in answer) {        
+        answer[i] = sanitizeHtml(answer[i]);
+    };
     
     models.comment_answers.create(answer)
-    .then(answer => {
-        models.comment_anwers.findByPk(answer.id, {             
+    .then(answer => {        
+        models.comment_answers.findByPk(answer.id, {             
             include: [{ model: models.users, required: true }],
             attributes: { 
                 include: [                    
@@ -119,6 +128,7 @@ exports.createCommentAnswer = (req, res, next) => {
 exports.deleteCommentAnswer = (req, res, next) => {
     models.comment_answers.findByPk(req.params.answer_id)
     .then(answer => {
+        // Vérification que l'utilisateur qui veut supprimer la réponse est bien son auteur ou un modérateur.
         if (req.params.user_id === answer.user_id || req.params.is_admin) {
             models.comment_answers.destroy({ where: { id: req.params.answer_id } })
             .then(() => res.status(200).json({ message: 'Réponse supprimée !'}))
@@ -169,13 +179,8 @@ exports.newCommentReaction = (req, res, next) => {
 };
 
 exports.cancelCommentReaction = (req, res, next) => {
-    models.comments.findByPk(req.params.comment_id)
-    .then(comment => {
-        if (req.params.user_id === comment.user_id || req.params.is_admin) {
-            models.comment_reactions.destroy({ where: { comment_id: req.params.comment_id, user_id: req.params.user_id } })
-            .then(() => res.status(200).json({ message: 'Réaction retirée !' }))
-            .catch(error => res.status(500).json({ error }));
-        }
-    })
-    .catch(error => res.status(404).json({ error }));
+    models.comment_reactions.destroy({ where: { comment_id: req.params.comment_id, user_id: req.params.user_id } })
+    .then(() => res.status(200).json({ message: 'Réaction retirée !' }))
+    .catch(error => res.status(500).json({ error }));
+
 };

@@ -1,6 +1,6 @@
 <template>
     <div class="signup container my-5">
-        <h1>Inscription</h1>
+        <h2>Inscription</h2>
         <form class="mx-auto m-3 mt-5 w-50">        
             <div class="form-group my-3">    
                 <label for="lastName">Nom</label><br>  

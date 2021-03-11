@@ -1,8 +1,12 @@
 <template>
     <div id="app">
-        <header class="header testnav">
-            <nav id="nav" class="d-flex justify-content-between align-items-center p-4">
-                <router-link to="/feed"><img src="./assets/icon-white.svg" alt="Logo Groupomania" class="logo_header" /></router-link>
+        <header class="header">
+            <nav id="nav" class="d-flex justify-content-between align-items-center p-2 py-4 p-sm-4">
+                <h1>
+                    <router-link to="/feed">
+                        <img src="./assets/icon-white.svg" alt="Logo Groupomania" width="100%" height="40px" />
+                    </router-link>
+                </h1>
                 <NavBar />
             </nav>
         </header>
@@ -62,7 +66,7 @@ a {
 }
 
 .header {
-    background-color: #303030;  
+    background-color: #303030;
     position: fixed;
     top: 0;
     left: 0;
@@ -72,10 +76,6 @@ a {
 
 .view {
     padding-top: 100px;
-}
-
-.logo_header {
-    height: 40px;
 }
 
 .button_bg {

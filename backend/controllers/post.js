@@ -1,5 +1,6 @@
 const { models } = require('../models');
 const sequelize = require('../models/index');
+const sanitizeHtml = require('sanitize-html');
 const fs = require('fs');
 
 models.posts.belongsTo(models.users, { foreignKey: 'user_id' });
@@ -68,8 +69,14 @@ exports.createPost = (req, res, next) => {
         }) : ({ 
             ...req.body,
             user_id: req.body.user.id 
-        });        
-        
+        }); 
+
+    for (let i in post) {   
+        if (post[i] !== null) {
+            post[i] = sanitizeHtml(post[i]);  
+        }                     
+    };
+
     models.posts.create(post)
     .then(post => {
         models.posts.findByPk(post.id, { 
@@ -122,12 +129,41 @@ exports.modifyPost = (req, res, next) => {
             
             const post = req.file ?                                                                       
                 ({
-                    ...req.body.post,
+                    ...JSON.parse(req.body.post),
                     file_url: `${req.protocol}://${req.get('host')}/files/${req.file.filename}`
                 }) : ({ ...req.body });
 
+            for (let i in post) {   
+                if (post[i] !== null) {
+                  post[i] = sanitizeHtml(post[i]);
+                }                     
+            };
+
             models.posts.update(post, { where: { id: req.params.post_id } })
-            .then(() => res.status(200).json({ message: 'Post modifié !' }))
+            .then(() => {
+                models.posts.findByPk(req.params.post_id, { 
+                    include: [{ model: models.users, required: true }, { model: models.comments }],
+                    attributes: { 
+                        include: [
+                            [ sequelize.fn('TIMESTAMPDIFF', sequelize.literal('SECOND'), sequelize.col('date_post'), sequelize.literal('CURRENT_TIMESTAMP')), 'date_post_sec' ],
+                            [ sequelize.fn('TIMESTAMPDIFF', sequelize.literal('MINUTE'), sequelize.col('date_post'), sequelize.literal('CURRENT_TIMESTAMP')), 'date_post_min' ],
+                            [ sequelize.fn('TIMESTAMPDIFF', sequelize.literal('HOUR'), sequelize.col('date_post'), sequelize.literal('CURRENT_TIMESTAMP')), 'date_post_hour' ],
+                            [ sequelize.fn('TIMESTAMPDIFF', sequelize.literal('DAY'), sequelize.col('date_post'), sequelize.literal('CURRENT_TIMESTAMP')), 'date_post_day' ],
+                            [ sequelize.fn('TIMESTAMPDIFF', sequelize.literal('MONTH'), sequelize.col('date_post'), sequelize.literal('CURRENT_TIMESTAMP')), 'date_post_month' ],
+                            [ sequelize.fn('TIMESTAMPDIFF', sequelize.literal('YEAR'), sequelize.col('date_post'), sequelize.literal('CURRENT_TIMESTAMP')), 'date_post_year' ],
+                            
+                            [ sequelize.fn('TIMESTAMPDIFF', sequelize.literal('SECOND'), sequelize.col('last_update'), sequelize.literal('CURRENT_TIMESTAMP')), 'last_update_sec' ],
+                            [ sequelize.fn('TIMESTAMPDIFF', sequelize.literal('MINUTE'), sequelize.col('last_update'), sequelize.literal('CURRENT_TIMESTAMP')), 'last_update_min' ],
+                            [ sequelize.fn('TIMESTAMPDIFF', sequelize.literal('HOUR'), sequelize.col('last_update'), sequelize.literal('CURRENT_TIMESTAMP')), 'last_update_hour' ],
+                            [ sequelize.fn('TIMESTAMPDIFF', sequelize.literal('DAY'), sequelize.col('last_update'), sequelize.literal('CURRENT_TIMESTAMP')), 'last_update_day' ],
+                            [ sequelize.fn('TIMESTAMPDIFF', sequelize.literal('MONTH'), sequelize.col('last_update'), sequelize.literal('CURRENT_TIMESTAMP')), 'last_update_month' ],
+                            [ sequelize.fn('TIMESTAMPDIFF', sequelize.literal('YEAR'), sequelize.col('last_update'), sequelize.literal('CURRENT_TIMESTAMP')), 'last_update_year' ]
+                        ]
+                    }
+                })
+                .then(post => res.status(200).json(post))
+                .catch(error => res.status(404).json({ error }))
+            })
             .catch(error => res.status(400).json({ error }));
         }
     })
@@ -161,12 +197,12 @@ exports.deletePost = (req, res, next) => {
     
 };
 
-exports.getAllPostCommentsAnswers = (req, res, next) => {
+exports.getAllPostCommentsAnswersCount = (req, res, next) => {
     models.comment_answers.count({ 
         where: { post_id: req.params.post_id } 
     })
     .then(count => res.status(200).json(count))
-    .catch(error => console.log(error));
+    .catch(error => res.status(500).json({ error }));
 };
 
 exports.getPostReactions = (req, res, next) => {
@@ -210,13 +246,7 @@ exports.newPostReaction = (req, res, next) => {
 };
 
 exports.cancelPostReaction = (req, res, next) => {
-    models.posts.findByPk(req.params.post_id)
-    .then(post => {
-        if (req.params.user_id === post.user_id || req.params.is_admin) {
-            models.post_reactions.destroy({ where: { post_id: req.params.post_id, user_id: req.params.user_id } })
-            .then(() => res.status(200).json({ message: 'Réaction retirée !' }))
-            .catch(error => res.status(500).json({ error }));
-        }
-    })
-    .catch(error => res.status(404).json({ error }));
+    models.post_reactions.destroy({ where: { post_id: req.params.post_id, user_id: req.params.user_id } })
+    .then(() => res.status(200).json({ message: 'Réaction retirée !' }))
+    .catch(error => res.status(500).json({ error }));
 };

@@ -1,12 +1,12 @@
 <template>
     <div>
-        <UsersList />
-        <div class="container my-5">
-            <h1>
+        <UsersList class="d-none d-lg-flex" />
+        <div class="container mt-5">
+            <h2>
                 <span v-if="loggedUser.username == $route.params.username">Vos Posts</span>
                 <span v-else>Posts de {{ $route.params.username }}</span>
-            </h1>
-            <div class="mt-4">
+            </h2>
+            <div>
                 <div class="row justify-content-center" v-for="post in posts" :key="post.id">
                     <Post @deleted="deletePost" :post="post" :type="'all_posts'" />
                 </div>  
@@ -14,7 +14,7 @@
                     <p>Aucun post !</p>
                 </div>
             </div>
-            <FormPost />
+            <FormPost @updated="updatePost" />
         </div>
     </div>
 </template>
@@ -51,7 +51,7 @@ export default {
         .catch(error => console.log(error));
     },
     
-    methods: {
+    methods: {        
         deletePost(post_id) {
             let object = '';
             
@@ -70,7 +70,21 @@ export default {
             http.get(`/users/${this.$route.params.user_id}/posts`)
             .then(response => this.posts = response.data)
             .catch(error => console.log(error)); 
-        }
+        },
+
+        updatePost(updatePost) {
+            let object = '';
+            
+            this.posts.forEach((post) => {
+                if (post.id === updatePost.id) {
+                    object = post;
+                }
+            });
+
+            let index = this.posts.indexOf(object);
+
+            this.posts.splice(index, 1, updatePost);
+        }       
     },
 
     watch: {

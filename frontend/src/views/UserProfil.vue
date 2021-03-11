@@ -1,8 +1,8 @@
 <template>
     <div class="container mt-5" v-if="user">
-        <h1>Mon profil</h1>
+        <h2>Mon profil</h2>
         <section class="my-5">
-            <h2>Mes informations personnelles</h2><hr>
+            <h3>Mes informations personnelles</h3><hr>
             <div class="my-5">
                 <p>Nom d'utilisateur : {{ user.username }}</p>
                 <p>Nom: {{ user.last_name }}</p>
@@ -23,7 +23,7 @@
             </div>
         </section>
         <section>
-            <h2>Informations diverses</h2><hr>
+            <h3>Informations diverses</h3><hr>
             <div class="my-5">
                 <p>Nombre de posts : {{ user.posts_count }}</p>
                 <p>Nombre commentaires : {{ user.comments_count }}</p>

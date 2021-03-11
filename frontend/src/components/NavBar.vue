@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="mr-4" v-if="loggedUser.id !== 0">
+        <div class="mr-sm-4" v-if="loggedUser.id !== 0">
             <b-dropdown data-toggle="dropdown" block variant="link" id="dropdown-offset"  offset="-58" toggle-class="text-decoration-none" no-caret>
                 <template #button-content>
                     <b-avatar :src="loggedUser.avatarUrl"></b-avatar>

@@ -2,6 +2,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { models } = require('../models');
 const sequelize = require('../models/index');
+const sanitizeHtml = require('sanitize-html');
 const fs = require('fs');
 
 models.posts.belongsTo(models.users, { foreignKey: 'user_id' });
@@ -17,6 +18,12 @@ exports.signup = (req, res, next) => {
             ...JSON.parse(req.body.user), 
             avatar_url: `${req.protocol}://${req.get('host')}/files/${req.file.filename}` 
         }) : ({...req.body});
+
+    for (let i in userObject) {      
+        if (userObject[i] !== null) {
+            userObject[i] = sanitizeHtml(userObject[i]); 
+        }          
+    };
 
     // Hachage du mot de passe avant qu'il soit envoyé à la base de données.    
     bcrypt.hash(userObject.password, 10)
@@ -66,7 +73,12 @@ exports.login = (req, res, next) => {
 };
 
 exports.getAllUsers = (req, res, next) => {
-    models.users.findAll()
+    models.users.findAll({ 
+        order: [
+            ['is_admin', 'DESC'],
+            ['last_name']
+        ]
+    })
     .then(users => res.status(200).json(users))
     .catch(error => res.status(400).json({ error }));
 };
@@ -144,6 +156,12 @@ exports.modifyAccount = (req, res, next) => {
             .catch(error => res.status(404).json({ error }));
         }
 
+        for (let i in userObject) {        
+            if (userObject[i] !== null) {
+                userObject[i] = sanitizeHtml(userObject[i]); 
+            }
+        };
+
         if (userObject.password) {
             bcrypt.hash(userObject.password, 10)
             .then(hash => {          
@@ -153,12 +171,20 @@ exports.modifyAccount = (req, res, next) => {
                     },
                     { where: { id: req.params.user_id }}
                 )
-                .then(user => res.status(200).json(user))
+                .then(() => {
+                    models.users.findByPk(req.params.user_id)
+                    .then(user => res.status(200).json(user))
+                    .catch(error => res.status(404).json({ error }));
+                })
                 .catch(error => res.status(400).json({ error }));
             })    
         } else {
             models.users.update({ ...userObject }, { where: { id: req.params.user_id }})
-            .then(() => res.status(200).json({ message: 'Profil utilisateur modifié !'}))
+            .then(() => {
+                models.users.findByPk(req.params.user_id)
+                .then(user => res.status(200).json(user))
+                .catch(error => res.status(404).json({ error }));
+            })
             .catch(error => res.status(400).json({ error }));
         }     
         

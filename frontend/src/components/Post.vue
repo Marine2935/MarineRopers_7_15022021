@@ -1,5 +1,5 @@
 <template>
-    <div class="test col-8 bg-white rounded shadow-sm p-3 my-3">
+    <div class="test col-lg-8 bg-white rounded shadow-sm p-3 mt-5">
         <div class="d-flex justify-content-between">
             <div class="d-flex text-left">
                 <b-avatar :src="post.user.avatar_url" size="3rem"></b-avatar>
@@ -21,21 +21,21 @@
         </div>                    
         <router-link :to="{ name: 'SinglePost', params: { post_id: post.id } }">
             <p class="my-4 text-left">{{ post.text }}</p>
-            <img :src="post.file_url" alt="Image du post" height="360" v-if="post.file_url && (extension === 'jpg' || extension === 'jpeg' || extension === 'png' || extension === 'gif')" />
-            <video height="360" controls v-if="post.file_url && extension === 'mp4'">
+            <img :src="post.file_url" alt="Image du post" width="100%" max-height="360" v-if="post.file_url && (extension === 'jpg' || extension === 'jpeg' || extension === 'png' || extension === 'gif')" />
+            <video width="100%" height="360" controls v-if="post.file_url && extension === 'mp4'">
                 <source :src="post.file_url">
             </video>
-            <iframe :src="post.link_url" class="border-0" width="100%" height="360" v-if="post.link_url"></iframe>
+            <iframe :src="post.link_url" class="border-0" width="100%" height="360" v-if="post.link_url && post.link_url !== 'null'"></iframe>
         </router-link>
         <hr>
         <div class="d-flex justify-content-between">
             <div class="d-flex">
                 <Reactions :type="type" :postId="post.id" />
-                <router-link class="ml-5" :to="{ name: 'SinglePost', params: { post_id: post.id } }">
-                    <p class="comments m-0">{{ post.comments.length + answersCount }} Commentaire<span v-if="post.comments.length > 1">s</span></p>
+                <router-link class="ml-3 ml-sm-5" :to="{ name: 'SinglePost', params: { post_id: post.id } }">
+                    <p class="comments m-0">{{ totalCount }} Commentaire<span v-if="totalCount > 1">s</span></p>
                 </router-link>
             </div>                        
-            <p class="m-0" v-show="post.last_update && post.last_update !== post.date_post">Modifié il y a 
+            <p class="d-none d-md-block m-0" v-show="post.last_update && post.last_update !== post.date_post">Modifié il y a 
                 <span v-if="post.last_update_sec < 60">{{ post.last_update_sec }}s</span>
                 <span v-if="post.last_update_min < 60 && post.last_update_min !== 0">{{ post.last_update_min }}min</span>
                 <span v-if="post.last_update_hour < 24 && post.last_update_hour !== 0">{{ post.last_update_hour }}h</span>
@@ -70,11 +70,19 @@ export default {
 
     props: {        
         post: Object,
+        changeCount: Number,
         type: String
     },
 
     computed: {
-        ...mapState(['loggedUser'])
+        ...mapState(['loggedUser']),
+
+        totalCount() {
+            if (this.changeCount) {
+                return this.post.comments.length + this.answersCount + this.changeCount 
+            }
+            return this.post.comments.length + this.answersCount
+        }
     },
 
     created() {

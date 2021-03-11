@@ -39,7 +39,7 @@
                         <div class="mt-1 mb-3" v-if="filePreview && !addLink">
                             <p>Image / Vidéo</p>
                             <div class="d-flex justify-content-center align-items-end">
-                                <video class="ml-4" height="100" controls v-if="file.type === 'video/mp4' || extension === 'mp4'">
+                                <video class="ml-4" height="100" controls v-if="extension === 'mp4' || (file && file.type === 'video/mp4')">
                                     <source :src="filePreview">
                                 </video>
                                 <img class="ml-4" :src="filePreview" height="100" v-else />  
@@ -72,43 +72,12 @@ export default {
         return {
             text: null,
             file: null,
+            file_url: null,
             link: null,
             filePreview: null,
             addLink: false,
             post: null,
             extension: null
-        }
-    },
-
-    updated() {
-        if (this.postId && this.text == null && this.popup) {
-            http.get(`/posts/${this.postId}`)
-            .then(response => {
-                let post = response.data;             
-
-                this.text = post.text;
-
-                if (post.file_url) {                    
-                    this.file = post.file_url;
-                    this.extension = this.file.split('.')[1];           
-                    this.addFile = true;
-                    this.filePreview = post.file_url ;
-                }
-                if (post.link_url) {
-                    this.link = post.link_url;
-                    this.addLink = true;
-                }
-            })
-            .catch(error => console.log(error));
-        } else if (!this.popup) {
-            this.text = null,
-            this.file = null,
-            this.link = null,
-            this.filePreview = null,
-            this.addFile = false,
-            this.addLink = false,
-            this.post = null,
-            this.extension = null
         }
     },
 
@@ -164,7 +133,7 @@ export default {
             const formData = new FormData();
             const post = {
                 text: this.text,
-                file_url: null,
+                file_url: this.file_url,
                 link_url: this.link,
                 user: this.loggedUser
             };           
@@ -179,7 +148,7 @@ export default {
             if (this.postId) {
                 http.put(`/posts/${this.postId}`, payload)
                 .then(response => {
-                    this.$emit("added", response.data);
+                    this.$emit("updated", response.data);
                     this.togglePopup();
                 })
                 .catch(error => console.log(error));
@@ -191,6 +160,45 @@ export default {
                 })
                 .catch(error => console.log(error));
             }           
+        },
+
+        preFillForm() {
+           if (this.popup && this.postId) {
+                http.get(`/posts/${this.postId}`)
+                .then(response => {
+                    let post = response.data;             
+
+                    this.text = post.text;
+
+                    if (post.file_url) {    
+                        this.addLink = false;             
+                        this.file_url = post.file_url;
+                        this.extension = post.file_url.split('.')[1];  
+                        this.filePreview = post.file_url;
+                    }
+                    if (post.link_url) {
+                        this.link = post.link_url;
+                        this.addLink = true;
+                    }
+                })
+                .catch(error => console.log(error));
+            } else if (!this.popup) {
+                this.text = null,
+                this.file = null,
+                this.file_url = null,
+                this.link = null,
+                this.filePreview = null,
+                this.addFile = false,
+                this.addLink = false,
+                this.post = null,
+                this.extension = null
+            }         
+        }
+    },
+
+    watch: {
+        popup() {
+            this.preFillForm();
         }
     }
 }

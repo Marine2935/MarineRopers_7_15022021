@@ -53,26 +53,6 @@ export default {
         }
     },
 
-    updated() {
-        if (this.popup && this.first_name === null && this.last_name === null) {
-            http.get(`/users/${this.userId}`)
-            .then(response => {
-                let user = response.data;             
-
-                this.last_name = user.last_name;
-                this.first_name = user.first_name;
-                this.username = user.username;
-                this.email = user.email;
-            })
-            .catch(error => console.log(error));
-        } else if (!this.popup) {
-            this.last_name = null;
-            this.first_name = null;
-            this.username = null;
-            this.email = null;
-        }
-    },
-
     computed: {
         ...mapState(['loggedUser', 'popup', 'userId'])        
     },
@@ -98,6 +78,32 @@ export default {
                 this.togglePopup();
             })
             .catch(error => console.log(error));              
+        },
+
+        preFillForm() {
+            if (this.popup) {
+            http.get(`/users/${this.userId}`)
+            .then(response => {
+                let user = response.data;             
+
+                this.last_name = user.last_name;
+                this.first_name = user.first_name;
+                this.username = user.username;
+                this.email = user.email;
+            })
+            .catch(error => console.log(error));
+            } else if (!this.popup) {
+                this.last_name = null;
+                this.first_name = null;
+                this.username = null;
+                this.email = null;
+            }
+        }
+    },
+
+    watch: {
+        popup() {
+            this.preFillForm();
         }
     }
 }

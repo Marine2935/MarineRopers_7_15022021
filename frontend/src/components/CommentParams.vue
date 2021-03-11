@@ -18,8 +18,9 @@ import { mapState } from "vuex";
 export default {
     name: 'CommentParams',
 
-    props: {        
+    props: { 
         answer_id: Number,
+        answers: Array,
         comment_id: Number,
         post_id: Number,
         type: String
@@ -40,7 +41,7 @@ export default {
             } else if (this.type === 'comment') {
                 http.delete(`/posts/${this.post_id}/comments/${this.comment_id}/${this.loggedUser.id}/${this.loggedUser.isAdmin}`)
                 .then(() => {
-                    this.$parent.$emit('deleted', this.comment_id);
+                    this.$parent.$emit('deleted', this.comment_id, this.answers.length);
                 })
                 .catch(error => console.log(error));
             }
